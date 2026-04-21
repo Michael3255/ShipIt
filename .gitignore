@@ -1,5 +1,22 @@
-.envbackend/venv/
+# Env files
+.env
+.env.*
+
+# Virtual environments
 venv/
+backend/venv/
+
+# Python
 __pycache__/
 *.pyc
-.env
+
+# Database
+backend/db.sqlite3
+
+# IDE
+.vscode/
+.idea/
+
+# Frontend
+node_modules/
+dist/
