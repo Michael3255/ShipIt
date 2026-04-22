@@ -1,7 +1,7 @@
-from django.urls import path
-from .views import CreateUserView, UserDetailsView
+from django.urls import path, include
+from .views import TeamListCreateView,TeamDetailView 
 
 urlpatterns = [
-    path('signup/', CreateUserView.as_view(), name='create_user'),
-    path('<int:pk>/', UserDetailsView.as_view(), name='user_detail'),
+    path('create_team/', TeamListCreateView.as_view(), name='create_team'),
+    path('<int:pk>/', TeamDetailView.as_view(), name='team_detail'),
 ]
