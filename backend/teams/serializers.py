@@ -8,10 +8,4 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "title",
-            "project",
         )
-        extra_kwargs = {
-            "id": {"read_only": True},
-            "title": {"required": True},
-            "project": {"required": False},
-        }
