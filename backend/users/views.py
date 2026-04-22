@@ -7,10 +7,10 @@ from .serializers import UserSerializer, CreateUserSerializer
 class CreateUserView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     queryset = User.objects.all()
-    serializer = CreateUserSerializer
+    serializer_class = CreateUserSerializer
 
 
 class UserDetailsView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [AllowAny]
     queryset = User.objects.all()
-    serializer = UserSerializer
+    serializer_class = UserSerializer
