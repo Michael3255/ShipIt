@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from teams.models import Team
 
 
 STATUS_CHOICES = [
@@ -18,12 +19,19 @@ class Project(models.Model):
         on_delete=models.CASCADE,
         related_name='projects'
     )
+
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.CASCADE,
+        related_name='projects'
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
 
-
+# Do we need to have an owner for Objective ? 
 class Objective(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField(blank=True)
@@ -31,12 +39,14 @@ class Objective(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='objectives'
-    )
+    ) 
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='No Status'
     )
+
+    #due_date = models.DateField(null=True, blank=True)
     due_date = models.DateField()
     project = models.ForeignKey(
         Project,
@@ -77,7 +87,7 @@ class Task(models.Model):
 
 
 class Comment(models.Model):
-    description = models.TextField(blank=True)
+    body = models.TextField(blank=False)
     task = models.ForeignKey(
         Task,
         on_delete=models.CASCADE,
