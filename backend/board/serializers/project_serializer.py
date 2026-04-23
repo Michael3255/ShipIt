@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from .models import Project
 
 class ProjectSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
+    team = serializers.PrimaryKeyRelatedField(read_only=True)
     objectives_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -16,7 +16,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "created_at",
             "objectives_count",
         )
-        read_only_fields = ("id", "created_at", "owner", "objectives_count")
+        read_only_fields = ("id", "created_at", "owner", "team", "objectives_count")
 
     def get_objectives_count(self, obj):
         return obj.objectives.count()
