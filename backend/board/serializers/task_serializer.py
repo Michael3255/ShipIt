@@ -3,6 +3,10 @@ from rest_framework import serializers
 from .models import Task
 from .objective_serializers import ObjectiveSummarySerializer
 
+class TaskSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Task
+        fields=["id", "title", "status"]
 
 class TaskSerializer(serializers.ModelSerializer):
     objective_detail = ObjectiveSummarySerializer(source="objective", read_only=True)
