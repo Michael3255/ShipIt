@@ -9,6 +9,7 @@ class ObjectiveSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'description',
+            'owner',
             'status',
             'due_date',
             'project',
