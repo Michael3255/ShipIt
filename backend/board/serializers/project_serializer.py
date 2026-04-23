@@ -1,6 +1,14 @@
 from rest_framework import serializers
 from .models import Project
 
+class ProjectSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Project
+        fields=["id",
+        "title",
+        "team"
+        ]
+
 class ProjectSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
     team = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -13,6 +21,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "owner",
+            "team",
             "created_at",
             "objectives_count",
         )
