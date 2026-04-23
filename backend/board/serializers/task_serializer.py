@@ -1,7 +1,6 @@
-
 from rest_framework import serializers
-from .models import Task
-from .objective_serializers import ObjectiveSummarySerializer
+from ..models import Task
+from .objective_serializer import ObjectiveSummarySerializer
 
 class TaskSummarySerializer(serializers.ModelSerializer):
     class Meta:

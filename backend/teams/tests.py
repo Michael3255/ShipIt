@@ -4,6 +4,7 @@ from .serializers import TeamSerializer
 
 
 class TeamSerializerTest(TestCase):
+    print("Team Tests")
     def test_team_serializer_returns_expected_fields(self):
         team = Team.objects.create(title="Team Alpha")
 

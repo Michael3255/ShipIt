@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Comment
+from ..models import Comment
 from .task_serializer import TaskSummarySerializer
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -9,7 +9,7 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = [
             'id',
-            'description',
+            'body',
             'task',
             'task_detail',
             'user',
