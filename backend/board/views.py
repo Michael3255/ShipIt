@@ -15,6 +15,8 @@ class ProjectListCreateView(generics.ListCreateAPIView):
     serializer_class = ProjectSerializer
 
     def perform_create(self, serializer):
+        # Retrieve a real user from the database to assign as the owner.
+        # Using the first user is a temporary workaround until auth is implemented.
         user = User.objects.first()  # temporary real user
         serializer.save(owner=user)
 
