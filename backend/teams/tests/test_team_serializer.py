@@ -1,6 +1,6 @@
 from django.test import TestCase
-from .models import Team
-from .serializers import TeamSerializer
+from ..models import Team
+from ..serializers import TeamSerializer
 
 
 class TeamSerializerTest(TestCase):
