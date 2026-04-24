@@ -23,7 +23,9 @@ class Project(models.Model):
     team = models.ForeignKey(
         Team,
         on_delete=models.CASCADE,
-        related_name='projects'
+        related_name='projects',
+        null=True, # making teams temporarily optional for project Yee 4/22/2026
+        blank=True # making teams temporarily optional for project Yee 4/22/2026
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -38,7 +40,9 @@ class Objective(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='objectives'
+        related_name='objectives',
+        null=True, 
+        blank=True
     ) 
     status = models.CharField(
         max_length=20,
@@ -47,7 +51,7 @@ class Objective(models.Model):
     )
 
     #due_date = models.DateField(null=True, blank=True)
-    due_date = models.DateField()
+    due_date = models.DateField(null=True, blank=True)
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,
