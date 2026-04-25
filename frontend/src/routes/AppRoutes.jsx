@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
 import Login from "../pages/Login";
+import Register from "../pages/Register";
 import { ProjectsPage } from "../pages/ProjectsPage";
 
 function AppRoutes() {
@@ -10,8 +11,9 @@ function AppRoutes() {
                 {/* Default route */}
                 <Route path="/" element={<Navigate to="/login" />} />
 
-                {/* Login */}
+                {/* Auth */}
                 <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
                 {/* Projects */}
                 <Route path="/projects" element={<ProjectsPage />} />
