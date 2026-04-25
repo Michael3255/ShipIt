@@ -1,12 +1,7 @@
 from django.urls import path
-from .views import (
-    ProjectListCreateView,
-    ProjectDetailView,
-    ObjectiveListCreateView,
-    ObjectiveDetailView,
-    TaskListCreateView,
-    TaskDetailView,
-)
+from .views.project_views import ProjectListCreateView, ProjectDetailView
+from .views.objective_views import ObjectiveListCreateView, ObjectiveDetailView
+from .views.task_views import TaskListCreateView, TaskDetailView
 
 urlpatterns = [
     path('projects/', ProjectListCreateView.as_view(), name='create_project'),
