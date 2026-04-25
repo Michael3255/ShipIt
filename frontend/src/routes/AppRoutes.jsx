@@ -1,22 +1,23 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
-import { ProjectsPage } from '../pages/ProjectsPage'
+import Login from "../pages/Login";
+import { ProjectsPage } from "../pages/ProjectsPage";
 
 function AppRoutes() {
     return (
-        <BrowserRouter>
-            <AuthProvider>
-                <Routes>
-                    {/* Login Route */}
+        <AuthProvider>
+            <Routes>
+                {/* Default route */}
+                <Route path="/" element={<Navigate to="/login" />} />
 
-                    {/* Projects Page routes */}
-                    <Route path="/projects" element={<ProjectsPage />} />
-                </Routes>
-            
-            </AuthProvider> 
-            
-        </BrowserRouter>
-    )
+                {/* Login */}
+                <Route path="/login" element={<Login />} />
+
+                {/* Projects */}
+                <Route path="/projects" element={<ProjectsPage />} />
+            </Routes>
+        </AuthProvider>
+    );
 }
 
-export default AppRoutes
+export default AppRoutes;
