@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/', include('board.urls')),
     path('api/', include('teams.urls')),
     path('api/', include('users.urls')),
+    
 
     # JWT auth endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
