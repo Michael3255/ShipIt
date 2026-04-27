@@ -125,7 +125,9 @@ export const TeamsPage = () => {
       <Card>
         <CardContent>
           <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-            <Typography variant="h6">Teams</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 600 }}>
+                Teams
+            </Typography>
 
             <Button variant="contained" type="submit" form="team-form">
               {isEditing ? 'SAVE TEAM' : 'CREATE TEAM'}
