@@ -1,26 +1,30 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
-import { ProjectsPage } from '../pages/ProjectsPage'
-import { TeamsPage } from '../pages/TeamsPage'
+
+import Login from "../pages/Login";
+import Register from "../pages/Register";
+import { ProjectsPage } from "../pages/ProjectsPage";
+import { TeamsPage } from "../pages/TeamsPage";
 
 function AppRoutes() {
     return (
-        <BrowserRouter>
-            <AuthProvider>
-                <Routes>
-                    {/* Login Route */}
+        <AuthProvider>
+            <Routes>
+                {/* Default route */}
+                <Route path="/" element={<Navigate to="/login" />} />
 
-                    {/* Projects Page routes */}
-                    <Route path="/projects" element={<ProjectsPage />} />
+                {/* Auth */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-                    {/* Teams */}
-                    <Route path="/teams" element={<TeamsPage />} />
-                </Routes>
-            
-            </AuthProvider> 
-            
-        </BrowserRouter>
-    )
+                {/* Projects */}
+                <Route path="/projects" element={<ProjectsPage />} />
+
+                {/* Teams */}
+                <Route path="/teams" element={<TeamsPage />} />
+            </Routes>
+        </AuthProvider>
+    );
 }
 
-export default AppRoutes
+export default AppRoutes;
