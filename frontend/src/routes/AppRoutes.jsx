@@ -1,34 +1,41 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
 import { ProjectsPage } from '../pages/ProjectsPage'
 import { ObjectiveDetail } from '../pages/ObjectiveDetail'
 import { TasksPage } from '../pages/TasksPage'
 import { TaskDetail } from '../pages/TaskDetail'
+import { TeamsPage } from "../pages/TeamsPage";
 
 function AppRoutes() {
     return (
-        <BrowserRouter>
-            <AuthProvider>
-                <Routes>
-                    {/* Login Route */}
+        <AuthProvider>
+            <Routes>
+                {/* Default route */}
+                <Route path="/" element={<Navigate to="/login" />} />
 
-                    {/* Projects Page routes */}
-                    <Route path="/projects" element={<ProjectsPage />} />
+                {/* Auth */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-                    {/* Objectives Page routes */}
-                    <Route path="/projects/:id" element={<ObjectiveDetail />} />
+                {/* Projects */}
+                <Route path="/projects" element={<ProjectsPage />} />
 
-                    {/* Tasks Page routes */}
-                    <Route path="/objectives/:id" element={<TasksPage />} />
+                {/* Objectives */}
+                <Route path="/projects/:id" element={<ObjectiveDetail />} />
 
-                    {/* Tasks Detail routes (comments on a task) */}
-                    <Route path="/tasks/:id" element={<TaskDetail />} />
-                </Routes>
-            
-            </AuthProvider> 
-            
-        </BrowserRouter>
-    )
+                {/* Tasks */}
+                <Route path="/objectives/:id" element={<TasksPage />} />
+
+                {/* Task Detail (comments) */}
+                <Route path="/tasks/:id" element={<TaskDetail />} />
+
+                {/* Teams */}
+                <Route path="/teams" element={<TeamsPage />} />
+            </Routes>
+        </AuthProvider>
+    );
 }
 
-export default AppRoutes
+export default AppRoutes;
