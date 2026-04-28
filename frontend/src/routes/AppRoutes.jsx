@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -10,6 +10,7 @@ import { TeamsPage } from "../pages/TeamsPage";
 
 function AppRoutes() {
     return (
+    <BrowserRouter>    
         <AuthProvider>
             <Routes>
                 {/* Default route */}
@@ -35,6 +36,7 @@ function AppRoutes() {
                 <Route path="/teams" element={<TeamsPage />} />
             </Routes>
         </AuthProvider>
+    </BrowserRouter>
     );
 }
 
