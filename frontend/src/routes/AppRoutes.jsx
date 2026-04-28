@@ -1,11 +1,16 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
+<<<<<<< HEAD
 
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import { ProjectsPage } from "../pages/ProjectsPage";
 import { TeamsPage } from "../pages/TeamsPage";
 import Dashboard from "../pages/Dashboard";
+=======
+import { ProjectsPage } from '../pages/ProjectsPage'
+import Layout from '../components/Layout'
+>>>>>>> 4b66bc6 (made some changes to layout)
 
 function AppRoutes() {
     return (

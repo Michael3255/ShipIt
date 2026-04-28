@@ -15,7 +15,9 @@ const PageContentHeader = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-between",
+  alignItems: "center",
   gap: theme.spacing(2),
+  flexWrap: "wrap",
 }));
 
 const PageHeaderBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
@@ -33,24 +35,55 @@ const PageHeaderToolbar = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
   gap: theme.spacing(1),
-  // Ensure the toolbar is always on the right side, even after wrapping
   marginLeft: "auto",
+  flexWrap: "wrap",
 }));
 
 function PageContainer(props) {
-  const { children, breadcrumbs, title, actions = null } = props;
+  const {
+    children,
+    breadcrumbs,
+    title,
+    actions = null,
+    maxWidth = "lg",
+    disableGutters = false,
+    containerSx = {},
+    contentSx = {},
+    fullHeight = false,
+  } = props;
 
   return (
-    <Container sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-      <Stack sx={{ flex: 1, my: 2 }} spacing={2}>
-        <Stack>
-          <PageHeaderBreadcrumbs
-            aria-label="breadcrumb"
-            separator={<NavigateNextRoundedIcon fontSize="small" />}
-          >
-            {breadcrumbs
-              ? breadcrumbs.map((breadcrumb, index) => {
-                  return breadcrumb.path ? (
+    <Container
+      maxWidth={maxWidth}
+      disableGutters={disableGutters}
+      sx={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        minHeight: fullHeight ? "100%" : "auto",
+        px: disableGutters ? 0 : { xs: 2, sm: 3 },
+        ...containerSx,
+      }}
+    >
+      <Stack
+        sx={{
+          flex: 1,
+          my: 2,
+          minWidth: 0,
+          minHeight: 0,
+        }}
+        spacing={2}
+      >
+        {(breadcrumbs || title || actions) && (
+          <Stack>
+            {breadcrumbs ? (
+              <PageHeaderBreadcrumbs
+                aria-label="breadcrumb"
+                separator={<NavigateNextRoundedIcon fontSize="small" />}
+              >
+                {breadcrumbs.map((breadcrumb, index) =>
+                  breadcrumb.path ? (
                     <MuiLink
                       key={index}
                       component={Link}
@@ -67,16 +100,28 @@ function PageContainer(props) {
                     >
                       {breadcrumb.title}
                     </Typography>
-                  );
-                })
-              : null}
-          </PageHeaderBreadcrumbs>
-          <PageContentHeader>
-            {title ? <Typography variant="h4">{title}</Typography> : null}
-            <PageHeaderToolbar>{actions}</PageHeaderToolbar>
-          </PageContentHeader>
-        </Stack>
-        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                  )
+                )}
+              </PageHeaderBreadcrumbs>
+            ) : null}
+
+            <PageContentHeader>
+              {title ? <Typography variant="h4">{title}</Typography> : null}
+              {actions ? <PageHeaderToolbar>{actions}</PageHeaderToolbar> : null}
+            </PageContentHeader>
+          </Stack>
+        )}
+
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            minWidth: 0,
+            minHeight: 0,
+            ...contentSx,
+          }}
+        >
           {children}
         </Box>
       </Stack>
@@ -90,10 +135,15 @@ PageContainer.propTypes = {
     PropTypes.shape({
       path: PropTypes.string,
       title: PropTypes.string.isRequired,
-    }),
+    })
   ),
   children: PropTypes.node,
   title: PropTypes.string,
+  maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  disableGutters: PropTypes.bool,
+  containerSx: PropTypes.object,
+  contentSx: PropTypes.object,
+  fullHeight: PropTypes.bool,
 };
 
 export default PageContainer;

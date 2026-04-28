@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useContext, useEffect, useState } from 'react'
 import AuthContext from '../context/AuthContext'
 import { getProjects, createProject, editProject, deleteProject } from '../api/projects'
+import { KanbanBoard } from '../components/KanbanBoard'
 
 //MUI
 import Box from '@mui/material/Box'
@@ -14,6 +15,7 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Toolbar from '@mui/material/Toolbar'
+import Tooltip from '@mui/material/Tooltip'
 import TableContainer from '@mui/material/TableContainer'
 import Table from '@mui/material/Table'
 import TableHead from '@mui/material/TableHead'
@@ -27,6 +29,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Icon from '@mui/material/Icon'
+import DashboardIcon from '@mui/icons-material/Dashboard'
 
 export const ProjectsPage = () => {
 
@@ -135,7 +138,7 @@ export const ProjectsPage = () => {
     setSelectedProject(null)
   }
 
-  if (loading) return <p>Loading Projects...</p>
+  if (loading) return null //<p>Loading Projects...</p>
 
   const isFormValid = formData.title !== '';
 
@@ -242,17 +245,18 @@ export const ProjectsPage = () => {
       </Container>
     )
   }
+  
+  if (viewMode === 'board' && selectedProject){
+    return <KanbanBoard project={selectedProject} />
+  }
 
   return(
-    <Container>
+    <PageContainer title="Projects">
       {error && <Alert severity='error' sx = {{ mb: 2 }}>{error}</Alert>}
 
       <Card>
         <CardContent>
-          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant='h6'>
-              Project List
-            </Typography>
+          <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button variant='contained' onClick={() => setViewMode('create')}>Add Project</Button>
           </Toolbar>
           <TableContainer>
@@ -274,7 +278,12 @@ export const ProjectsPage = () => {
                   projects.map((project) => (
                     <TableRow key={project.id}>
                       <TableCell>
-                        {project.title || '-'}
+                        <Typography sx= {{ cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' }}}
+                        onClick={() => {
+                          setSelectedProject(project)
+                          setViewMode('board')
+                        }}
+                        >{project.title}</Typography>
                       </TableCell>
                       <TableCell>
                         {project.description || '-'}
@@ -286,30 +295,31 @@ export const ProjectsPage = () => {
                         {project.team || '-'}
                       </TableCell>
                       <TableCell>
-                        <IconButton onClick={() => {
+                        <Tooltip title="Project Details">
+                          <IconButton onClick={() => {
                           setSelectedProject(project)
                           setViewMode('details')
-
                         }}><VisibilityIcon /> </IconButton>
-
-                        <IconButton onClick={() => {
+                        </Tooltip>
+                        <Tooltip title="Edit Project">
+                          <IconButton onClick={() => {
                           setSelectedProject(project)
-
                           setFormData({
                             title: project.title || '',
                             description: project.description || '',
                             owner: project.owner || '',
                             team: project.team || ''
                           })
-
                           setViewMode('edit')
                         }}><ModeEditIcon /></IconButton>
-                       {confirmDeleteId === project.id ? (
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant='caption'>Delete this project?</Typography>
-                          <Button
-                            size="small" variant='contained'
-                            color='error' onClick={() => {
+                        </Tooltip>
+                        <Tooltip title="Delete Project">
+                          {confirmDeleteId === project.id ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography variant='caption'>Delete this project?</Typography>
+                              <Button
+                              size="small" variant='contained'
+                              color='error' onClick={() => {
                               handleDelete(project.id)
                               setConfirmDeleteId(null)
                             }}
@@ -324,7 +334,15 @@ export const ProjectsPage = () => {
                         <IconButton onClick={() => setConfirmDeleteId(project.id)}>
                           <DeleteIcon />
                         </IconButton>
-                       )} 
+                       )}
+                        </Tooltip>
+                        
+                       
+                       <Tooltip title="Kanban Board">
+                        <IconButton>
+                          <DashboardIcon />
+                        </IconButton> 
+                       </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))
@@ -334,7 +352,7 @@ export const ProjectsPage = () => {
           </TableContainer>
         </CardContent>
       </Card>
-    </Container>
+    </PageContainer>
   )
 
 }
