@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useContext, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import AuthContext from '../context/AuthContext'
-import { getObjectives, createObjective, editObjective, deleteObjective } from '../api/objectives'
+import { getTasks, createTask, editTask, deleteTask } from '../api/tasks'
 
 // MUI
 import Box from '@mui/material/Box'
@@ -28,14 +28,14 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import PageContainer from '../components/PageContainer'
 
-export const ObjectiveDetail = () => {
+export const TasksPage = () => {
   const { accessToken } = useContext(AuthContext)
   const { id } = useParams()
   const navigate = useNavigate()
 
   const [viewMode, setViewMode] = useState('list')
-  const [objectives, setObjectives] = useState([])
-  const [selectedObjective, setSelectedObjective] = useState(null)
+  const [tasks, setTasks] = useState([])
+  const [selectedTask, setSelectedTask] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
@@ -45,22 +45,23 @@ export const ObjectiveDetail = () => {
     description: '',
     status: '',
     due_date: '',
+    assigned_user: '',
   })
 
   useEffect(() => {
-    async function loadObjectives() {
+    async function loadTasks() {
       try {
         setLoading(true)
         setError('')
-        const data = await getObjectives(id, accessToken)
-        setObjectives(data)
+        const data = await getTasks(id, accessToken)
+        setTasks(data)
       } catch (err) {
         setError(err.message)
       } finally {
         setLoading(false)
       }
     }
-    if (accessToken) loadObjectives()
+    if (accessToken) loadTasks()
   }, [accessToken, id])
 
   function handleChange(event) {
@@ -72,33 +73,33 @@ export const ObjectiveDetail = () => {
     event.preventDefault()
     setError('')
     try {
-      let savedObjective
+      let savedTask
 
-      if (viewMode === 'edit' && selectedObjective) {
-        savedObjective = await editObjective(selectedObjective.id, formData, accessToken)
-        setObjectives((prev) =>
-          prev.map((obj) => (obj.id === savedObjective.id ? savedObjective : obj))
+      if (viewMode === 'edit' && selectedTask) {
+        savedTask = await editTask(selectedTask.id, formData, accessToken)
+        setTasks((prev) =>
+          prev.map((task) => (task.id === savedTask.id ? savedTask : task))
         )
       } else {
-        savedObjective = await createObjective(id, formData, accessToken)
-        setObjectives((prev) => [...prev, savedObjective])
+        savedTask = await createTask(id, formData, accessToken)
+        setTasks((prev) => [...prev, savedTask])
       }
 
-      setFormData({ title: '', description: '', status: '', due_date: '' })
-      setSelectedObjective(null)
+      setFormData({ title: '', description: '', status: '', due_date: '', assigned_user: '' })
+      setSelectedTask(null)
       setViewMode('list')
     } catch (err) {
       setError(err.message)
     }
   }
 
-  async function handleDelete(objectiveId) {
+  async function handleDelete(taskId) {
     setError('')
     try {
-      await deleteObjective(objectiveId, accessToken)
-      setObjectives((prev) => prev.filter((obj) => obj.id !== objectiveId))
-      if (selectedObjective && selectedObjective.id === objectiveId) {
-        setSelectedObjective(null)
+      await deleteTask(taskId, accessToken)
+      setTasks((prev) => prev.filter((task) => task.id !== taskId))
+      if (selectedTask && selectedTask.id === taskId) {
+        setSelectedTask(null)
         setViewMode('list')
       }
     } catch (err) {
@@ -108,18 +109,18 @@ export const ObjectiveDetail = () => {
 
   function resetForm() {
     setError('')
-    setFormData({ title: '', description: '', status: '', due_date: '' })
-    setSelectedObjective(null)
+    setFormData({ title: '', description: '', status: '', due_date: '', assigned_user: '' })
+    setSelectedTask(null)
   }
 
-  if (loading) return <p>Loading Objectives...</p>
+  if (loading) return <p>Loading Tasks...</p>
 
   const isFormValid = formData.title !== '' && formData.due_date !== ''
 
   if (viewMode === 'create' || viewMode === 'edit') {
     return (
       <PageContainer
-        title={viewMode === 'edit' ? 'Edit Objective' : 'New Objective'}
+        title={viewMode === 'edit' ? 'Edit Task' : 'New Task'}
         breadcrumbs={[{ title: viewMode === 'edit' ? 'Edit' : 'New' }]}
       >
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -162,12 +163,19 @@ export const ObjectiveDetail = () => {
                 }}
                 />
               </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  fullWidth label="Assigned User" name="assigned_user"
+                  value={formData.assigned_user} onChange={handleChange}
+                  sx={{ backgroundColor: 'black', borderRadius: 1, input: { color: 'white' }, '& .MuiInputLabel-root': { color: 'grey.400' }, '& .MuiInputLabel-root.Mui-focused': { color: '#1976d2' } }}
+                />
+              </Grid>
             </Grid>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
               <Button type="button" variant="contained" onClick={() => setViewMode('list')}>Back</Button>
               <Button type="button" variant="contained" onClick={resetForm}>Cancel</Button>
               <Button type="submit" variant={isFormValid ? 'contained' : 'outlined'} disabled={!isFormValid}>
-                {viewMode === 'edit' ? 'Save Changes' : 'Create Objective'}
+                {viewMode === 'edit' ? 'Save Changes' : 'Create Task'}
               </Button>
             </Box>
           </FormGroup>
@@ -176,20 +184,21 @@ export const ObjectiveDetail = () => {
     )
   }
 
-  if (viewMode === 'details' && selectedObjective) {
+  if (viewMode === 'details' && selectedTask) {
     return (
       <Container>
-        <Typography variant="h4">Objective Details</Typography>
+        <Typography variant="h4">Task Details</Typography>
         <Card>
           <CardContent>
-            <Typography>Title: {selectedObjective.title || '-'}</Typography>
-            <Typography>Description: {selectedObjective.description || '-'}</Typography>
-            <Typography>Status: {selectedObjective.status || '-'}</Typography>
-            <Typography>Due Date: {selectedObjective.due_date || '-'}</Typography>
+            <Typography>Title: {selectedTask.title || '-'}</Typography>
+            <Typography>Description: {selectedTask.description || '-'}</Typography>
+            <Typography>Status: {selectedTask.status || '-'}</Typography>
+            <Typography>Due Date: {selectedTask.due_date || '-'}</Typography>
+            <Typography>Assigned User: {selectedTask.assigned_user || '-'}</Typography>
           </CardContent>
         </Card>
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" onClick={() => { setSelectedObjective(null); setViewMode('list') }}>
+          <Button variant="contained" onClick={() => { setSelectedTask(null); setViewMode('list') }}>
             Back
           </Button>
         </Box>
@@ -203,8 +212,8 @@ export const ObjectiveDetail = () => {
       <Card>
         <CardContent>
           <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="h6">Objectives</Typography>
-            <Button variant="contained" onClick={() => setViewMode('create')}>Add Objective</Button>
+            <Typography variant="h6">Tasks</Typography>
+            <Button variant="contained" onClick={() => setViewMode('create')}>Add Task</Button>
           </Toolbar>
           <TableContainer>
             <Table>
@@ -214,41 +223,44 @@ export const ObjectiveDetail = () => {
                   <TableCell>Description</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Due Date</TableCell>
+                  <TableCell>Assigned User</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {objectives.length === 0 ? (
+                {tasks.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5}>No Objectives Yet</TableCell>
+                    <TableCell colSpan={6}>No Tasks Yet</TableCell>
                   </TableRow>
                 ) : (
-                  objectives.map((objective) => (
-                    <TableRow key={objective.id}>
-                      <TableCell>{objective.title || '-'}</TableCell>
-                      <TableCell>{objective.description || '-'}</TableCell>
-                      <TableCell>{objective.status || '-'}</TableCell>
-                      <TableCell>{objective.due_date || '-'}</TableCell>
+                  tasks.map((task) => (
+                    <TableRow key={task.id}>
+                      <TableCell>{task.title || '-'}</TableCell>
+                      <TableCell>{task.description || '-'}</TableCell>
+                      <TableCell>{task.status || '-'}</TableCell>
+                      <TableCell>{task.due_date || '-'}</TableCell>
+                      <TableCell>{task.assigned_user || '-'}</TableCell>
                       <TableCell>
-                        <IconButton onClick={() => { setSelectedObjective(objective); setViewMode('details') }}>
+                        <IconButton onClick={() => { setSelectedTask(task); setViewMode('details') }}>
                           <VisibilityIcon />
                         </IconButton>
                         <IconButton onClick={() => {
-                          setSelectedObjective(objective)
+                          setSelectedTask(task)
                           setFormData({
-                            title: objective.title || '',
-                            description: objective.description || '',
-                            status: objective.status || '',
-                            due_date: objective.due_date || '',
+                            title: task.title || '',
+                            description: task.description || '',
+                            status: task.status || '',
+                            due_date: task.due_date || '',
+                            assigned_user: task.assigned_user || '',
                           })
                           setViewMode('edit')
                         }}>
                           <ModeEditIcon />
                         </IconButton>
-                        {confirmDeleteId === objective.id ? (
+                        {confirmDeleteId === task.id ? (
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="caption">Delete this objective?</Typography>
-                            <Button size="small" variant="contained" color="error" onClick={() => { handleDelete(objective.id); setConfirmDeleteId(null) }}>
+                            <Typography variant="caption">Delete this task?</Typography>
+                            <Button size="small" variant="contained" color="error" onClick={() => { handleDelete(task.id); setConfirmDeleteId(null) }}>
                               Confirm
                             </Button>
                             <Button size="small" variant="outlined" onClick={() => setConfirmDeleteId(null)}>
@@ -256,15 +268,15 @@ export const ObjectiveDetail = () => {
                             </Button>
                           </Box>
                         ) : (
-                          <IconButton onClick={() => setConfirmDeleteId(objective.id)}>
+                          <IconButton onClick={() => setConfirmDeleteId(task.id)}>
                             <DeleteIcon />
                           </IconButton>
                         )}
                         <Button
                           size="small" variant="outlined"
-                          onClick={() => navigate(`/tasks?objective=${objective.id}`)}
+                          onClick={() => navigate(`/tasks/${task.id}`)}
                         >
-                          View Tasks
+                          View Comments
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -279,4 +291,4 @@ export const ObjectiveDetail = () => {
   )
 }
 
-export default ObjectiveDetail
+export default TasksPage
