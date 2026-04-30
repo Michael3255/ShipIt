@@ -3,6 +3,7 @@ import { AuthProvider } from "../context/AuthContext";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import { ProjectsPage } from '../pages/ProjectsPage'
+import { ProjectDetails } from "../pages/ProjectDetail";
 import { ObjectiveDetail } from '../pages/ObjectiveDetail'
 import { TasksPage } from '../pages/TasksPage'
 import { TaskDetail } from '../pages/TaskDetail'
@@ -28,9 +29,10 @@ function AppRoutes() {
 
                     {/* Projects */}
                     <Route path="/projects" element={<ProjectsPage />} />
+                    <Route path="/projects/:id" element={<ProjectDetails />} />
 
                     {/* Objectives */}
-                    <Route path="/projects/:id" element={<ObjectiveDetail />} />
+                    <Route path="/objects/:id" element={<ObjectiveDetail />} />
 
                     {/* Tasks */}
                     <Route path="/objectives/:id" element={<TasksPage />} />
