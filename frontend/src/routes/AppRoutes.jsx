@@ -8,10 +8,10 @@ import { TasksPage } from '../pages/TasksPage'
 import { TaskDetail } from '../pages/TaskDetail'
 import { TeamsPage } from "../pages/TeamsPage";
 import Dashboard from "../pages/Dashboard";
+import Layout from "../components/Layout"
 
 function AppRoutes() {
     return (
-    <BrowserRouter>    
         <AuthProvider>
             <Routes>
                 {/* Default route */}
@@ -21,26 +21,28 @@ function AppRoutes() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
 
-                {/* Dashboard */}
-                <Route path="/dashboard" element={<Dashboard />} />
+                {/* With Header */}
+                <Route element= { <Layout /> }>
+                    {/* Dashboard */}
+                    <Route path="/dashboard" element={<Dashboard />} />
 
-                {/* Projects */}
-                <Route path="/projects" element={<ProjectsPage />} />
+                    {/* Projects */}
+                    <Route path="/projects" element={<ProjectsPage />} />
 
-                {/* Objectives */}
-                <Route path="/projects/:id" element={<ObjectiveDetail />} />
+                    {/* Objectives */}
+                    <Route path="/projects/:id" element={<ObjectiveDetail />} />
 
-                {/* Tasks */}
-                <Route path="/objectives/:id" element={<TasksPage />} />
+                    {/* Tasks */}
+                    <Route path="/objectives/:id" element={<TasksPage />} />
 
-                {/* Task Detail (comments) */}
-                <Route path="/tasks/:id" element={<TaskDetail />} />
+                    {/* Task Detail (comments) */}
+                    <Route path="/tasks/:id" element={<TaskDetail />} />
 
-                {/* Teams */}
-                <Route path="/teams" element={<TeamsPage />} />
+                    {/* Teams */}
+                    <Route path="/teams" element={<TeamsPage />} />
+                </Route>
             </Routes>
         </AuthProvider>
-    </BrowserRouter>
     );
 }
 
