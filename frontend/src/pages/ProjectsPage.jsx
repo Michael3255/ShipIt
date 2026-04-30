@@ -50,8 +50,6 @@ export const ProjectsPage = () => {
   const [formData, setFormData]=useState({
     title: '',
     description: '',
-    owner: '',
-    team: '',
   })
 
   useEffect(() => {
@@ -102,8 +100,6 @@ export const ProjectsPage = () => {
       setFormData({
         title:'',
         description: '',
-        owner: '',
-        team: '',
       })
       setSelectedProject(null)
       setViewMode('list')
@@ -132,8 +128,6 @@ export const ProjectsPage = () => {
     setFormData({
       title: '',
       description: '',
-      owner: '',
-      team: '',
     })
     setSelectedProject(null)
   }
@@ -170,32 +164,6 @@ export const ProjectsPage = () => {
                       '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {borderColor: '1976d2'}
                     },
                   }}/>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField fullWidth label="Project Owner" name="owner" value={formData.owner} onChange={handleChange}
-                  sx={{
-                    backgroundColor: 'black', borderRadius: 1, input: { color: 'white'},
-                    '& .MuiInputLabel-root': { color: 'grey.400'},
-                    '& .MuiInputLabel-root.Mui-focused': { color: '#1976d2'},
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '1976d2',
-                      '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {borderColor: '1976d2'}
-                    },
-                  }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField fullWidth label="Team" name="team" value={formData.team} onChange={handleChange}
-                  sx={{
-                    backgroundColor: 'black', borderRadius: 1, input: { color: 'white'},
-                    '& .MuiInputLabel-root': { color: 'grey.400'},
-                    '& .MuiInputLabel-root.Mui-focused': { color: '#1976d2'},
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '1976d2',
-                      '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {borderColor: '1976d2'}
-                    },
-                  }}
-                  />
                 </Grid>
               </Grid>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
