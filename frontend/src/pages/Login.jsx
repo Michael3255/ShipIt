@@ -34,7 +34,7 @@ function Login() {
 
       const data = await response.json()
       login(data)
-      navigate("/projects")
+      navigate("/dashboard")
     } catch (err) {
       setError("Invalid username or password")
     }
