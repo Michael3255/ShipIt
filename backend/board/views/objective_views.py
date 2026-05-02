@@ -9,7 +9,11 @@ class ObjectiveListCreateView(generics.ListCreateAPIView):
     serializer_class = ObjectiveSerializer
 
     def get_queryset(self):
-        return Objective.objects.filter(project__team=self.request.user.team)
+        queryset = Objective.objects.filter(project__team=self.request.user.team)
+        project_id = self.request.query_params.get('project')
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

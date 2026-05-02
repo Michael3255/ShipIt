@@ -10,6 +10,8 @@ class ObjectiveSummarySerializer(serializers.ModelSerializer):
 class ObjectiveSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
     project_detail = ProjectSummarySerializer(source="project", read_only=True)
+    tasks_total = serializers.SerializerMethodField()
+    tasks_done = serializers.SerializerMethodField()
 
     class Meta:
         model = Objective
@@ -23,8 +25,16 @@ class ObjectiveSerializer(serializers.ModelSerializer):
             'project_detail',
             'owner',
             'created_at',
+            'tasks_total',
+            'tasks_done',
         ]
         read_only_fields = ['id', 'owner', 'project_detail', 'created_at']
+    
+    def get_tasks_total(self, obj):
+        return obj.tasks.count()
+
+    def get_tasks_done(self,obj):
+        return obj.tasks.filter(status='Done').count()
     
     def validate(self, attrs):
         project = attrs.get("project")
