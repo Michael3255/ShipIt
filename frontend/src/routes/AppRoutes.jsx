@@ -15,35 +15,37 @@ function AppRoutes() {
     return (
         <AuthProvider>
             <Routes>
-                {/* Default route */}
-                <Route path="/" element={<Navigate to="/login" />} />
+            {/* Default route */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            
+            {/* Auth */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            {/* With Header */}
+            <Route element={<Layout />}>
+                {/* Dashboard */}
+                <Route path="/dashboard" element={<Dashboard />} />
+                
+                {/* Teams */}
+                <Route path="/teams" element={<TeamsPage />} />
+                
+                {/* Project list */}
+                <Route path="/projects" element={<ProjectsPage />} />
+                
+                {/* Project detail */}
+                <Route path="/projects/:projectId" element={<ProjectDetails />} />
+                
+                {/* Objective detail */}
+                <Route path="/objectives/:objectiveId" element={<ObjectiveDetail />} />
 
-                {/* Auth */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                {/* Objective → tasks */}
+                <Route path="/objectives/:objectiveId/tasks" element={<TasksPage />} />
 
-                {/* With Header */}
-                <Route element= { <Layout /> }>
-                    {/* Dashboard */}
-                    <Route path="/dashboard" element={<Dashboard />} />
-
-                    {/* Projects */}
-                    <Route path="/projects" element={<ProjectsPage />} />
-                    <Route path="/projects/:id" element={<ProjectDetails />} />
-
-                    {/* Objectives */}
-                    <Route path="/objects/:id" element={<ObjectiveDetail />} />
-
-                    {/* Tasks */}
-                    <Route path="/objectives/:id" element={<TasksPage />} />
-
-                    {/* Task Detail (comments) */}
-                    <Route path="/tasks/:id" element={<TaskDetail />} />
-
-                    {/* Teams */}
-                    <Route path="/teams" element={<TeamsPage />} />
-                </Route>
-            </Routes>
+                {/* Task Detail */}
+                <Route path="/tasks/:taskId" element={<TaskDetail />} />
+            </Route>
+        </Routes>
         </AuthProvider>
     );
 }
