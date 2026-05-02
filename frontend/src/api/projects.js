@@ -16,6 +16,21 @@ export async function getProjects(accessToken) {
   return data;
 }
 
+export async function getProject(projectId, accessToken) {
+  const response = await fetch(`${BASE_URL}/${projectId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch project");
+  }
+  return data;
+}
+
 export async function createProject(formData, accessToken) {
   const response = await fetch(`${BASE_URL}/`, {
     method: "POST",

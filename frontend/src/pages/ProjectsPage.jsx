@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useContext, useEffect, useState } from 'react'
 import AuthContext from '../context/AuthContext'
 import { getProjects, createProject, editProject, deleteProject } from '../api/projects'
@@ -25,7 +26,7 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import TableBody from '@mui/material/TableBody'
 import IconButton from '@mui/material/IconButton'
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import AssignmentIndTwoToneIcon from '@mui/icons-material/AssignmentIndTwoTone';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Icon from '@mui/material/Icon'
@@ -34,6 +35,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard'
 export const ProjectsPage = () => {
 
   const { accessToken } = useContext(AuthContext)
+  const navigate = useNavigate()
 
   //viewMode create and list
   const [viewMode, setViewMode]=useState('list')
@@ -179,40 +181,6 @@ export const ProjectsPage = () => {
     )
   }
 
-  if (viewMode === 'details' && selectedProject){
-    return(
-      <Container>
-        <Typography variant='h4'>
-          Project Details
-        </Typography>
-        <Card>
-          <CardContent>
-            <Typography>
-              Title: {selectedProject.title || '-'}
-            </Typography>
-            <Typography>
-              Description: {selectedProject.description || '-'}
-            </Typography>
-            <Typography>
-              Owner: {selectedProject.owner || '-'}
-            </Typography>
-            <Typography>
-              Team: {selectedProject.team || '-'}
-            </Typography>
-          </CardContent>
-        </Card>
-        <Box>
-          <Button
-            variant="contained" onClick={() => {
-              setSelectedProject(null)
-              setViewMode('list')
-              }
-            }
-          >Back</Button>
-        </Box>
-      </Container>
-    )
-  }
   
   if (viewMode === 'board' && selectedProject){
     return <KanbanBoard project={selectedProject} />
@@ -235,6 +203,7 @@ export const ProjectsPage = () => {
                   <TableCell>Description</TableCell>
                   <TableCell>Project Owner</TableCell>
                   <TableCell>Team</TableCell>
+                  <TableCell>Objectives</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -263,12 +232,11 @@ export const ProjectsPage = () => {
                         {project.team || '-'}
                       </TableCell>
                       <TableCell>
-                        <Tooltip title="Project Details">
-                          <IconButton onClick={() => {
-                          setSelectedProject(project)
-                          setViewMode('details')
-                        }}><VisibilityIcon /> </IconButton>
+                        <Tooltip title="View Project Objectives">
+                          <IconButton onClick={() => navigate(`/projects/${project.id}`)}> <AssignmentIndTwoToneIcon /> </IconButton>
                         </Tooltip>
+                      </TableCell>
+                      <TableCell>
                         <Tooltip title="Edit Project">
                           <IconButton onClick={() => {
                           setSelectedProject(project)
@@ -304,8 +272,6 @@ export const ProjectsPage = () => {
                         </IconButton>
                        )}
                         </Tooltip>
-                        
-                       
                        <Tooltip title="Kanban Board">
                         <IconButton>
                           <DashboardIcon />
