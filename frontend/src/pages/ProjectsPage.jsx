@@ -5,9 +5,8 @@ import AuthContext from '../context/AuthContext'
 import { getProjects, createProject, editProject, deleteProject } from '../api/projects'
 import { KanbanBoard } from '../components/KanbanBoard'
 
-//MUI
+// MUI
 import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
 import Alert from '@mui/material/Alert'
 import FormGroup from '@mui/material/FormGroup'
 import Grid from '@mui/material/Grid'
@@ -15,278 +14,483 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Toolbar from '@mui/material/Toolbar'
 import Tooltip from '@mui/material/Tooltip'
-import TableContainer from '@mui/material/TableContainer'
 import Table from '@mui/material/Table'
+import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
-import PageContainer from '../components/PageContainer'
-import Typography from '@mui/material/Typography'
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import TableBody from '@mui/material/TableBody'
+import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
-import AssignmentIndTwoToneIcon from '@mui/icons-material/AssignmentIndTwoTone';
-import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Icon from '@mui/material/Icon'
+import Chip from '@mui/material/Chip'
+import Stack from '@mui/material/Stack'
+import Skeleton from '@mui/material/Skeleton'
+import PageContainer from '../components/PageContainer'
+import AddIcon from '@mui/icons-material/Add'
+import AssignmentIndTwoToneIcon from '@mui/icons-material/AssignmentIndTwoTone'
+import ModeEditIcon from '@mui/icons-material/ModeEdit'
+import DeleteIcon from '@mui/icons-material/Delete'
 import DashboardIcon from '@mui/icons-material/Dashboard'
+import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 
+// ─── Design Tokens ────────────────────────────────────────────────
+const COLORS = {
+  blue:      '#1B6FEB',
+  blueDark:  '#1358C4',
+  blueLight: '#EBF2FF',
+  teal:      '#0ABFA3',
+  tealLight: '#E0FAF6',
+  border:    '#E4EAF2',
+  surface:   '#F7F9FC',
+}
+
+const inputSx = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 2,
+    '&:hover fieldset':       { borderColor: COLORS.blue },
+    '&.Mui-focused fieldset': { borderColor: COLORS.blue },
+  },
+  '& .MuiInputLabel-root.Mui-focused': { color: COLORS.blue },
+}
+
+// ─── Empty State ──────────────────────────────────────────────────
+function EmptyState({ onAdd }) {
+  return (
+    <Box sx={{
+      textAlign: 'center', py: 8,
+      border: `1.5px dashed ${COLORS.border}`,
+      borderRadius: 3,
+      bgcolor: COLORS.surface,
+    }}>
+      <FolderOpenIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+      <Typography sx={{ fontWeight: 700, color: 'text.secondary', mb: 0.5 }}>
+        No projects yet
+      </Typography>
+      <Typography sx={{ fontSize: 13, color: 'text.disabled', mb: 3 }}>
+        Create your first project to get started
+      </Typography>
+      <Button
+        variant="contained"
+        startIcon={<AddIcon />}
+        onClick={onAdd}
+        sx={{
+          bgcolor: COLORS.blue,
+          '&:hover': { bgcolor: COLORS.blueDark },
+          borderRadius: 2,
+          textTransform: 'none',
+          fontWeight: 700,
+        }}
+      >
+        Create Project
+      </Button>
+    </Box>
+  )
+}
+
+// ─── Project Form ─────────────────────────────────────────────────
+function ProjectForm({ viewMode, formData, handleChange, handleSubmit, onBack, onCancel, isFormValid }) {
+  return (
+    <PageContainer
+      title={viewMode === 'edit' ? 'Edit Project' : 'New Project'}
+      breadcrumbs={[
+        { title: 'Projects', path: '/projects' },
+        { title: viewMode === 'edit' ? 'Edit' : 'New' },
+      ]}
+    >
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        autoComplete="off"
+        sx={{
+          mt: 2, p: 3,
+          border: `1.5px solid ${COLORS.border}`,
+          borderRadius: 3,
+          bgcolor: 'background.paper',
+        }}
+      >
+        <FormGroup>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth required
+                label="Project Title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                size="small"
+                sx={inputSx}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth
+                label="Description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                size="small"
+                sx={inputSx}
+              />
+            </Grid>
+          </Grid>
+          <Stack direction="row" spacing={1.5} mt={3}>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={!isFormValid}
+              sx={{
+                bgcolor: COLORS.blue,
+                '&:hover': { bgcolor: COLORS.blueDark },
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 700,
+                px: 3,
+              }}
+            >
+              {viewMode === 'edit' ? 'Save Changes' : 'Create Project'}
+            </Button>
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={onCancel}
+              sx={{
+                borderColor: COLORS.blue,
+                color: COLORS.blue,
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 600,
+                '&:hover': { bgcolor: COLORS.blueLight },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="text"
+              onClick={onBack}
+              sx={{ color: 'text.secondary', borderRadius: 2, textTransform: 'none' }}
+            >
+              ← Back
+            </Button>
+          </Stack>
+        </FormGroup>
+      </Box>
+    </PageContainer>
+  )
+}
+
+// ─── Main Component ───────────────────────────────────────────────
 export const ProjectsPage = () => {
-
   const { accessToken } = useContext(AuthContext)
   const navigate = useNavigate()
 
-  //viewMode create and list
-  const [viewMode, setViewMode]=useState('list')
-
-  //hooks to manage states
-  const [projects, setProjects]=useState([])
+  const [viewMode, setViewMode]           = useState('list')
+  const [projects, setProjects]           = useState([])
   const [selectedProject, setSelectedProject] = useState(null)
-  
-  const [loading, setLoading]=useState(true)
-  const [error, setError]=useState('')
-
+  const [loading, setLoading]             = useState(true)
+  const [error, setError]                 = useState('')
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
-
-  const [formData, setFormData]=useState({
-    title: '',
-    description: '',
-  })
+  const [formData, setFormData]           = useState({ title: '', description: '' })
 
   useEffect(() => {
-    async function loadProjects(){
-      try{
+    async function loadProjects() {
+      try {
         setLoading(true)
         setError('')
-
         const data = await getProjects(accessToken)
         setProjects(data)
-      }catch(err){
+      } catch (err) {
         setError(err.message)
-      }finally{
+      } finally {
         setLoading(false)
       }
     }
-    if (accessToken){
-      loadProjects()
-    }
+    if (accessToken) loadProjects()
   }, [accessToken])
 
-  console.log('accessToken:', accessToken)
-
-  function handleChange(event){
+  function handleChange(event) {
     const { name, value } = event.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]:value,
-    }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  async function handleSubmit(event){
+  async function handleSubmit(event) {
     event.preventDefault()
     setError('')
-    try{
+    try {
       let savedProject
-
-      if(viewMode === 'edit' && selectedProject){
+      if (viewMode === 'edit' && selectedProject) {
         savedProject = await editProject(selectedProject.id, formData, accessToken)
-
-        setProjects((prev) => prev.map((project) => 
-          project.id === savedProject.id ? savedProject : project)
-      )
-      } else{
+        setProjects((prev) => prev.map((p) => p.id === savedProject.id ? savedProject : p))
+      } else {
         savedProject = await createProject(formData, accessToken)
         setProjects((prev) => [...prev, savedProject])
       }
-      setFormData({
-        title:'',
-        description: '',
-      })
-      setSelectedProject(null)
+      resetForm()
       setViewMode('list')
-    } catch(err){
-        setError(err.message)
-      }
-  }
-
-  async function handleDelete(projectId){
-    setError('')
-    try{
-      await deleteProject(projectId, accessToken)
-      setProjects((prev) => prev.filter((project) => project.id !== projectId))
-
-      if (selectedProject && selectedProject.id === projectId){
-        setSelectedProject(null)
-        setViewMode('list')
-      }
-    } catch(err){
+    } catch (err) {
       setError(err.message)
     }
   }
 
-  function resetForm(){
+  async function handleDelete(projectId) {
     setError('')
-    setFormData({
-      title: '',
-      description: '',
-    })
+    try {
+      await deleteProject(projectId, accessToken)
+      setProjects((prev) => prev.filter((p) => p.id !== projectId))
+      if (selectedProject?.id === projectId) {
+        setSelectedProject(null)
+        setViewMode('list')
+      }
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  function resetForm() {
+    setError('')
+    setFormData({ title: '', description: '' })
     setSelectedProject(null)
   }
 
-  if (loading) return null //<p>Loading Projects...</p>
+  const isFormValid = formData.title !== ''
 
-  const isFormValid = formData.title !== '';
+  // ── Views ────────────────────────────────────────────────────────
 
-  if(viewMode === 'create' || viewMode === 'edit'){
-    return(
-      <PageContainer title={viewMode === 'edit' ? 'Edit Project' : 'Project'} breadcrumbs={[{title: viewMode === 'edit' ? 'Edit' : 'New'}]}>
-          {error && <Alert severity='error' sx={{ mb: 2 }}>{error}</Alert>}
-
-          <Box
-          component="form" onSubmit={handleSubmit} autoComplete='off' sx={{ width: '100%', mt: 2 }}>
-            <FormGroup>
-              <Grid container spacing= {2}>
-                <Grid size={{ xs:12, sm: 6 }}>
-                  <TextField fullWidth label="Project Title" name="title" value={formData.title} onChange={handleChange} sx={{ backgroundColor: 'gray', borderRadius: 1, input: { color: 'white'}, '& .MuiInputLabel-root': { color: 'grey.400'}, '& .MuiInputLabel-root.Mui-focused': { color: '#1976d2'},
-                  '& .MuiOutlinedInput-notchedOutline': {borderColor: '#1976d2',
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutLinedInput-notchedOutline': { borderColor: '1976d2' }
-                  },
-                }}/>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
-                  <TextField fullWidth label="Description"
-                  name="description"
-                  value={formData.description} onChange={handleChange} sx={{
-                    backgroundColor: 'black', borderRadius: 1, input: { color: 'white'},
-                    '& .MuiInputLabel-root': { color: 'grey.400'},
-                    '& .MuiInputLabel-root.Mui-focused': { color: '#1976d2'},
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '1976d2',
-                      '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {borderColor: '1976d2'}
-                    },
-                  }}/>
-                </Grid>
-              </Grid>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                <Button type="button" variant="contained" onClick={() => setViewMode('list')}>Back</Button>
-
-                <Button type="button" variant="contained" onClick={resetForm}>Cancel</Button>
-
-                <Button type="submit" variant={isFormValid ? 'contained' : 'outlined'} disabled={!isFormValid}>{viewMode === 'edit' ? 'Save Changes' : 'Create Project'} </Button>
-              </Box>
-            </FormGroup>
-          </Box>
-        </PageContainer>
+  if (viewMode === 'create' || viewMode === 'edit') {
+    return (
+      <ProjectForm
+        viewMode={viewMode}
+        formData={formData}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        onBack={() => setViewMode('list')}
+        onCancel={() => { resetForm(); setViewMode('list') }}
+        isFormValid={isFormValid}
+      />
     )
   }
 
-  
-  if (viewMode === 'board' && selectedProject){
+  if (viewMode === 'board' && selectedProject) {
     return <KanbanBoard project={selectedProject} />
   }
 
-  return(
-    <PageContainer title="Projects">
-      {error && <Alert severity='error' sx = {{ mb: 2 }}>{error}</Alert>}
+  // ── List View ────────────────────────────────────────────────────
+  return (
+    <PageContainer
+      title="Projects"
+      breadcrumbs={[{ title: 'Projects' }]}
+    >
+      {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
 
-      <Card>
-        <CardContent>
-          <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button variant='contained' onClick={() => setViewMode('create')}>Add Project</Button>
-          </Toolbar>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Description</TableCell>
-                  <TableCell>Project Owner</TableCell>
-                  <TableCell>Team</TableCell>
-                  <TableCell>Objectives</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {projects.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5}>No Projects Available</TableCell>
+      {/* Header row */}
+      <Stack direction="row" justifycontent="space-between" alignitems="center" mb={3}>
+        <Stack direction="row" alignitems="center" spacing={1.5}>
+          <Typography sx={{ fontWeight: 800, fontSize: 18, color: 'text.primary' }}>
+            All Projects
+          </Typography>
+          {!loading && (
+            <Chip
+              label={`${projects.length} project${projects.length !== 1 ? 's' : ''}`}
+              size="small"
+              sx={{
+                bgcolor: COLORS.blueLight,
+                color: COLORS.blue,
+                fontWeight: 700,
+                fontSize: 11,
+                height: 22,
+              }}
+            />
+          )}
+        </Stack>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => setViewMode('create')}
+          sx={{
+            bgcolor: COLORS.blue,
+            '&:hover': { bgcolor: COLORS.blueDark },
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 700,
+            boxShadow: `0 4px 12px rgba(27,111,235,0.25)`,
+          }}
+        >
+          Add Project
+        </Button>
+      </Stack>
+
+      {/* Loading skeletons */}
+      {loading ? (
+        <Box>
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} variant="rounded" height={56} sx={{ borderRadius: 2, mb: 1.5 }} />
+          ))}
+        </Box>
+      ) : projects.length === 0 ? (
+        <EmptyState onAdd={() => setViewMode('create')} />
+      ) : (
+        <Card sx={{
+          border: `1.5px solid ${COLORS.border}`,
+          borderRadius: 3,
+          boxShadow: 'none',
+          overflow: 'hidden',
+        }}>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ bgcolor: COLORS.surface }}>
+                    {['Project', 'Description', 'Owner', 'Team', 'Actions'].map((h) => (
+                      <TableCell key={h} sx={{
+                        fontWeight: 700,
+                        fontSize: 12,
+                        textTransform: 'uppercase',
+                        letterSpacing: 0.8,
+                        color: 'text.secondary',
+                        borderBottom: `1.5px solid ${COLORS.border}`,
+                        py: 1.5,
+                      }}>
+                        {h}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                ):(
-                  projects.map((project) => (
-                    <TableRow key={project.id}>
+                </TableHead>
+                <TableBody>
+                  {projects.map((project, index) => (
+                    <TableRow
+                      key={project.id}
+                      sx={{
+                        bgcolor: index % 2 === 0 ? 'background.paper' : COLORS.surface,
+                        '&:hover': { bgcolor: COLORS.blueLight },
+                        transition: 'background 0.15s ease',
+                      }}
+                    >
+                      {/* Title — clickable to board */}
                       <TableCell>
-                        <Typography sx= {{ cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' }}}
-                        onClick={() => {
-                          setSelectedProject(project)
-                          setViewMode('board')
-                        }}
-                        >{project.title}</Typography>
+                        <Typography
+                          sx={{
+                            cursor: 'pointer',
+                            color: COLORS.blue,
+                            fontWeight: 700,
+                            fontSize: 14,
+                            '&:hover': { textDecoration: 'underline' },
+                          }}
+                          onClick={() => {
+                            setSelectedProject(project)
+                            setViewMode('board')
+                          }}
+                        >
+                          {project.title}
+                        </Typography>
                       </TableCell>
-                      <TableCell>
-                        {project.description || '-'}
+
+                      <TableCell sx={{ color: 'text.secondary', fontSize: 13 }}>
+                        {project.description || '—'}
                       </TableCell>
-                      <TableCell>
-                        {project.owner || '-'}
+
+                      <TableCell sx={{ fontSize: 13 }}>
+                        {project.owner ? (
+                          <Chip
+                            label={project.owner}
+                            size="small"
+                            sx={{ bgcolor: COLORS.tealLight, color: COLORS.teal, fontWeight: 600, fontSize: 11 }}
+                          />
+                        ) : '—'}
                       </TableCell>
-                      <TableCell>
-                        {project.team || '-'}
+
+                      <TableCell sx={{ fontSize: 13, color: 'text.secondary' }}>
+                        {project.team || '—'}
                       </TableCell>
+
+                      {/* Actions */}
                       <TableCell>
-                        <Tooltip title="View Project Objectives">
-                          <IconButton onClick={() => navigate(`/projects/${project.id}`)}> <AssignmentIndTwoToneIcon /> </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip title="Edit Project">
-                          <IconButton onClick={() => {
-                          setSelectedProject(project)
-                          setFormData({
-                            title: project.title || '',
-                            description: project.description || '',
-                            owner: project.owner || '',
-                            team: project.team || ''
-                          })
-                          setViewMode('edit')
-                        }}><ModeEditIcon /></IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete Project">
+                        <Stack direction="row" alignitems="center" spacing={0.5}>
+                          <Tooltip title="View Objectives">
+                            <IconButton
+                              size="small"
+                              onClick={() => navigate(`/projects/${project.id}`)}
+                              sx={{ color: COLORS.blue, '&:hover': { bgcolor: COLORS.blueLight } }}
+                            >
+                              <AssignmentIndTwoToneIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip title="Open Board">
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setSelectedProject(project)
+                                setViewMode('board')
+                              }}
+                              sx={{ color: COLORS.teal, '&:hover': { bgcolor: COLORS.tealLight } }}
+                            >
+                              <DashboardIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip title="Edit Project">
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setSelectedProject(project)
+                                setFormData({
+                                  title: project.title || '',
+                                  description: project.description || '',
+                                })
+                                setViewMode('edit')
+                              }}
+                              sx={{ color: 'text.secondary', '&:hover': { bgcolor: COLORS.blueLight } }}
+                            >
+                              <ModeEditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+
+                          {/* Delete with inline confirm */}
                           {confirmDeleteId === project.id ? (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Typography variant='caption'>Delete this project?</Typography>
+                            <Stack direction="row" alignitems="center" spacing={0.5}>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>
+                                Delete?
+                              </Typography>
                               <Button
-                              size="small" variant='contained'
-                              color='error' onClick={() => {
-                              handleDelete(project.id)
-                              setConfirmDeleteId(null)
-                            }}
-                          > Confirm
-                          </Button>
-                          <Button size="small"
-                          variant='outlined'
-                          onClick={() => setConfirmDeleteId(null)}>Cancel
-                          </Button>
-                        </Box>
-                       ) : (
-                        <IconButton onClick={() => setConfirmDeleteId(project.id)}>
-                          <DeleteIcon />
-                        </IconButton>
-                       )}
-                        </Tooltip>
-                       <Tooltip title="Kanban Board">
-                        <IconButton>
-                          <DashboardIcon />
-                        </IconButton> 
-                       </Tooltip>
+                                size="small"
+                                variant="contained"
+                                color="error"
+                                sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700, fontSize: 11, py: 0.3 }}
+                                onClick={() => { handleDelete(project.id); setConfirmDeleteId(null) }}
+                              >
+                                Yes
+                              </Button>
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 600, fontSize: 11, py: 0.3 }}
+                                onClick={() => setConfirmDeleteId(null)}
+                              >
+                                No
+                              </Button>
+                            </Stack>
+                          ) : (
+                            <Tooltip title="Delete Project">
+                              <IconButton
+                                size="small"
+                                onClick={() => setConfirmDeleteId(project.id)}
+                                sx={{ color: 'error.main', '&:hover': { bgcolor: '#FFF0F0' } }}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </Stack>
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </CardContent>
-      </Card>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
+      )}
     </PageContainer>
   )
-
 }
