@@ -27,11 +27,12 @@ import IconButton from '@mui/material/IconButton'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import Chip from '@mui/material/Chip'
 import PageContainer from '../components/PageContainer'
 
 export const TaskDetail = () => {
   const { accessToken } = useContext(AuthContext)
-  const { id } = useParams()
+  const { taskId } = useParams()
 
   const [viewMode, setViewMode] = useState('list')
   const [comments, setComments] = useState([])
@@ -48,24 +49,21 @@ export const TaskDetail = () => {
   useEffect(() => {
     async function loadTask() {
       try {
-        const data = await getTask(id, accessToken)
+        const data = await getTask(taskId, accessToken)
         setTask(data)
       } catch (err) {
         setError(err.message)
       }
     }
     if (accessToken) loadTask()
-  }, [accessToken, id])
-
-  console.log('accessToken:', accessToken)
-  console.log('id:', id)
+  }, [accessToken, taskId])
 
   useEffect(() => {
     async function loadComments() {
       try {
         setLoading(true)
         setError('')
-        const data = await getComments(id, accessToken)
+        const data = await getComments(taskId, accessToken)
         setComments(data)
       } catch (err) {
         setError(err.message)
@@ -74,7 +72,7 @@ export const TaskDetail = () => {
       }
     }
     if (accessToken) loadComments()
-  }, [accessToken, id])
+  }, [accessToken, taskId])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -93,7 +91,7 @@ export const TaskDetail = () => {
           prev.map((comment) => (comment.id === savedComment.id ? savedComment : comment))
         )
       } else {
-        savedComment = await createComment(id, formData, accessToken)
+        savedComment = await createComment(taskId, formData, accessToken)
         setComments((prev) => [...prev, savedComment])
       }
 
@@ -125,7 +123,7 @@ export const TaskDetail = () => {
     setSelectedComment(null)
   }
 
-  if (loading) return <p>Loading Comments...</p>
+  if (loading) return <p>Loading...</p>
 
   const isFormValid = formData.body !== ''
 
@@ -148,12 +146,7 @@ export const TaskDetail = () => {
                   onChange={handleChange}
                   multiline
                   rows={4}
-                  sx={{
-                    backgroundColor: 'gray', borderRadius: 1,
-                    input: { color: 'white' },
-                    '& .MuiInputLabel-root': { color: 'grey.400' },
-                    '& .MuiInputLabel-root.Mui-focused': { color: '#1976d2' },
-                  }}
+                  sx={{ backgroundColor: 'gray', borderRadius: 1, input: { color: 'white' }, '& .MuiInputLabel-root': { color: 'grey.400' }, '& .MuiInputLabel-root.Mui-focused': { color: '#1976d2' } }}
                 />
               </Grid>
             </Grid>
@@ -181,7 +174,7 @@ export const TaskDetail = () => {
             <Typography>Created: {selectedComment.created_at || '-'}</Typography>
           </CardContent>
         </Card>
-        <Box>
+        <Box sx={{ mt: 2 }}>
           <Button variant="contained" onClick={() => { setSelectedComment(null); setViewMode('list') }}>
             Back
           </Button>
@@ -195,13 +188,26 @@ export const TaskDetail = () => {
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       {task && (
-        <Card sx={{ mb: 2 }}>
+        <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Typography variant="h5">{task.title}</Typography>
-            <Typography>Status: {task.status || '-'}</Typography>
-            <Typography>Description: {task.description || '-'}</Typography>
-            <Typography>Assigned To: {task.assigned_user || '-'}</Typography>
-            <Typography>Due Date: {task.due_date || '-'}</Typography>
+            <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', px: 0 }}>
+              <Typography variant="h6">{task.title}</Typography>
+              <Chip label={task.status || 'No Status'} variant="outlined" />
+            </Toolbar>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">Description</Typography>
+                <Typography>{task.description || '-'}</Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">Assigned To</Typography>
+                <Typography>{task.assigned_user || '-'}</Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">Due Date</Typography>
+                <Typography>{task.due_date || '-'}</Typography>
+              </Grid>
+            </Grid>
           </CardContent>
         </Card>
       )}
