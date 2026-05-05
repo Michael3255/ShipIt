@@ -1,7 +1,7 @@
 import React from "react"
 import { AppBar, Toolbar, Typography, Box, Button, Avatar, Stack } from "@mui/material"
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch"
-import { Link, useNavigate, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useContext } from "react"
 import AuthContext from "../context/AuthContext"
 
@@ -45,7 +45,6 @@ export default function Header() {
             </AppBar>
         </Box>
     )
-  const navigate = useNavigate()
 
   return (
     <AppBar
