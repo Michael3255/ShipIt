@@ -12,8 +12,10 @@ export async function getTask(taskId, accessToken) {
   return data;
 }
 
-export async function getTasks(objectiveId, accessToken) {
-  const response = await fetch(`${BASE_URL}/?objective=${objectiveId}`, {
+export async function getTasks(filters = {}, accessToken) {
+  const params = new URLSearchParams(filters);
+
+  const response = await fetch(`${BASE_URL}/?${params}`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
