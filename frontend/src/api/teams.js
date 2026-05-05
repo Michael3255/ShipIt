@@ -25,12 +25,11 @@ export async function getTeams(accessToken = null) {
   return data;
 }
 
-export async function createTeam(formData, accessToken) {
+export async function createTeam(formData) {
   const response = await fetch(`${BASE_URL}/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
     },
     body: JSON.stringify(formData),
   });

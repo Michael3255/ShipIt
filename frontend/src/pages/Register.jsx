@@ -69,7 +69,7 @@ function Register() {
 
       localStorage.setItem("access", data.access)
       localStorage.setItem("refresh", data.refresh)
-      navigate("/projects")
+      navigate("/login")
     } catch (err) {
       setError(err.message)
     }
