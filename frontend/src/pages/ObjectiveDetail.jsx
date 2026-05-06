@@ -262,7 +262,7 @@ export const ObjectiveDetail = () => {
                         )}
                         <Button
                           size="small" variant="outlined"
-                          onClick={() => navigate(`/tasks?objective=${objective.id}`)}
+                          onClick={() => navigate(`/objectives/${objective.id}/tasks`)}
                         >
                           View Tasks
                         </Button>

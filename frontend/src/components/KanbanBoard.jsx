@@ -3,25 +3,26 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import AuthContext from '../context/AuthContext'
 import { getProject } from '../api/projects'
 import { getObjectives } from '../api/objectives'
-
+import { getTasks } from '../api/tasks'
+import { TaskCard } from './TaskCard'
+import { KanbanListView } from './KanbanListView'
 import PageContainer from './PageContainer'
 import {
-  Typography, Box, Chip, Button, Stack, Card,
-  CardContent, Skeleton, Alert
+  Typography, Box, Chip, Button, Stack, Skeleton, Alert
 } from '@mui/material'
-import DashboardIcon from '@mui/icons-material/Dashboard'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import CloseIcon from '@mui/icons-material/Close'
+import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
+import ViewListIcon from '@mui/icons-material/ViewList'
 
-// ─── Design Tokens ────────────────────────────────────────────────
 const COLORS = {
-  blue:        '#1B6FEB',
-  blueDark:    '#1358C4',
-  blueLight:   '#EBF2FF',
-  teal:        '#0ABFA3',
-  tealLight:   '#E0FAF6',
-  border:      '#E4EAF2',
-  surface:     '#F7F9FC',
+  blue:      '#1B6FEB',
+  blueDark:  '#1358C4',
+  blueLight: '#EBF2FF',
+  teal:      '#0ABFA3',
+  tealLight: '#E0FAF6',
+  border:    '#E4EAF2',
+  surface:   '#F7F9FC',
 }
 
 const COLUMN_META = {
@@ -30,71 +31,13 @@ const COLUMN_META = {
   'Done':        { accent: COLORS.teal,  bg: COLORS.tealLight, chipBg: '#A7F3E8', chipColor: '#065F52' },
 }
 
-// ─── Mock Data ────────────────────────────────────────────────────
-const MOCK_TASKS = [
-  { id: 1, title: 'Organize closet',              description: 'Complete research report',  status: 'Done',        objective: 'Expand market reach',           assignee: 'clafoy0',       objective_id: 2 },
-  { id: 2, title: 'Schedule dentist appointment', description: 'Collaborate with team',     status: 'Done',        objective: 'Enhance brand awareness',        assignee: 'shartridge1',   objective_id: 2 },
-  { id: 3, title: 'Start new book',               description: 'Update project status',     status: 'To Do',       objective: 'Optimize supply chain',          assignee: 'hhrihorovich2', objective_id: 2 },
-  { id: 4, title: 'Fix login bug',                description: 'Complete research report',  status: 'To Do',       objective: 'Increase sales by 10%',          assignee: 'rmadders3',     objective_id: 1 },
-  { id: 5, title: 'Go for a run',                 description: 'Conduct market analysis',   status: 'In Progress', objective: 'Increase social media presence', assignee: 'asolley4',      objective_id: 1 },
-]
-
 const COLUMNS = [
   { id: 'To Do',       label: 'To Do'       },
   { id: 'In Progress', label: 'In Progress' },
   { id: 'Done',        label: 'Done'        },
 ]
 
-// ─── Task Card ────────────────────────────────────────────────────
-function TaskCard({ task }) {
-  return (
-    <Card sx={{
-      border: `1.5px solid ${COLORS.border}`,
-      borderRadius: 2,
-      boxShadow: 'none',
-      cursor: 'pointer',
-      transition: 'all 0.15s ease',
-      '&:hover': {
-        borderColor: COLORS.blue,
-        transform: 'translateY(-1px)',
-        boxShadow: `0 4px 12px rgba(27,111,235,0.10)`,
-      },
-    }}>
-      <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-        <Typography sx={{ fontWeight: 600, fontSize: 13, color: 'text.primary', mb: 0.5, lineHeight: 1.3 }}>
-          {task.title}
-        </Typography>
-        {task.description && (
-          <Typography sx={{ fontSize: 11, color: 'text.secondary', mb: 1, lineHeight: 1.4,
-            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
-          }}>
-            {task.description}
-          </Typography>
-        )}
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Chip
-            label={task.objective}
-            size="small"
-            sx={{ fontSize: 10, height: 18, bgcolor: COLORS.blueLight, color: COLORS.blue, fontWeight: 600,
-              maxWidth: 140, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
-            }}
-          />
-          <Box sx={{
-            width: 24, height: 24, borderRadius: '50%',
-            bgcolor: COLORS.teal, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Typography sx={{ fontSize: 10, fontWeight: 700, color: '#fff' }}>
-              {task.assignee?.[0]?.toUpperCase() ?? '?'}
-            </Typography>
-          </Box>
-        </Stack>
-      </CardContent>
-    </Card>
-  )
-}
-
-// ─── Column ───────────────────────────────────────────────────────
-function Column({ column, tasks }) {
+function Column({ column, tasks, navigate }) {
   const meta = COLUMN_META[column.id] || COLUMN_META['To Do']
 
   return (
@@ -119,7 +62,6 @@ function Column({ column, tasks }) {
           sx={{ bgcolor: meta.chipBg, color: meta.chipColor, fontWeight: 700, fontSize: 11, height: 20 }}
         />
       </Stack>
-
       {/* Task cards */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minHeight: 80 }}>
         {tasks.length === 0 ? (
@@ -131,13 +73,12 @@ function Column({ column, tasks }) {
             <Typography sx={{ fontSize: 12, color: 'text.disabled' }}>No tasks</Typography>
           </Box>
         ) : (
-          tasks.map((task) => <TaskCard key={task.id} task={task} />)
+          tasks.map((task) => <TaskCard key={task.id} task={task} navigate={navigate} />)
         )}
       </Box>
     </Box>
   )
 }
-
 // ─── Main Component ───────────────────────────────────────────────
 export const KanbanBoard = () => {
   const { projectId }          = useParams()
@@ -146,23 +87,25 @@ export const KanbanBoard = () => {
   const { accessToken }        = useContext(AuthContext)
   const objectiveFilter        = searchParams.get('objective')
 
-  const [tasks]                = useState(MOCK_TASKS)
-  const [project, setProject]  = useState(null)
+  const [tasks, setTasks]           = useState([])
+  const [project, setProject]       = useState(null)
   const [objectives, setObjectives] = useState([])
-  const [loading, setLoading]  = useState(true)
-  const [error, setError]      = useState('')
-
-  // Fetch project title and objectives for breadcrumb + filter label
+  const [loading, setLoading]       = useState(true)
+  const [error, setError]           = useState('')
+  const [viewMode, setViewMode]     = useState('board')
+// Fetch project title and objectives for breadcrumb + filter label
   useEffect(() => {
     async function load() {
       try {
         setLoading(true)
-        const [projectData, objectivesData] = await Promise.all([
+        const [projectData, objectivesData, tasksData] = await Promise.all([
           getProject(projectId, accessToken),
           getObjectives(projectId, accessToken),
+          getTasks({ project: projectId }, accessToken),
         ])
         setProject(projectData)
         setObjectives(objectivesData)
+        setTasks(tasksData)
       } catch (err) {
         setError(err.message)
       } finally {
@@ -171,18 +114,15 @@ export const KanbanBoard = () => {
     }
     if (accessToken && projectId) load()
   }, [projectId, accessToken])
-
-  // Derive active objective name for breadcrumb
+ // Derive active objective name for breadcrumb
   const activeObjective = objectives.find((o) => String(o.id) === String(objectiveFilter))
-
-  // Filter tasks
+// Filter tasks
   const displayTasks = objectiveFilter
-    ? tasks.filter((task) => task.objective_id === Number(objectiveFilter))
+    ? tasks.filter((task) => String(task.objective) === String(objectiveFilter))
     : tasks
 
   const STATUS = Object.groupBy(displayTasks, ({ status }) => status)
-
-  // Breadcrumbs
+// Breadcrumbs
   const breadcrumbs = [
     { title: 'Projects', path: '/projects' },
     { title: project?.title ?? 'Project', path: `/projects/${projectId}` },
@@ -211,58 +151,79 @@ export const KanbanBoard = () => {
     >
       {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
 
-      {/* Filter banner */}
-      {objectiveFilter && (
-        <Stack
-          direction="row"
-          alignItems="center"
-          spacing={1.5}
-          sx={{
-            mb: 2, px: 2, py: 1,
-            bgcolor: COLORS.blueLight,
-            border: `1.5px solid ${COLORS.blue}`,
-            borderRadius: 2,
-          }}
-        >
-          <FilterListIcon sx={{ fontSize: 16, color: COLORS.blue }} />
-          <Typography sx={{ fontSize: 13, fontWeight: 600, color: COLORS.blue, flex: 1 }}>
-            Showing tasks for: {activeObjective?.title ?? `Objective ${objectiveFilter}`}
-          </Typography>
+      {/* View toggle + filter banner */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+        {objectiveFilter ? (
+          <Stack direction="row" alignItems="center" spacing={1.5} sx={{
+            px: 2, py: 1, bgcolor: COLORS.blueLight,
+            border: `1.5px solid ${COLORS.blue}`, borderRadius: 2, flex: 1, mr: 2
+          }}>
+            <FilterListIcon sx={{ fontSize: 16, color: COLORS.blue }} />
+            <Typography sx={{ fontSize: 13, fontWeight: 600, color: COLORS.blue, flex: 1 }}>
+              Showing tasks for: {activeObjective?.title ?? `Objective ${objectiveFilter}`}
+            </Typography>
+            <Button size="small" startIcon={<CloseIcon sx={{ fontSize: 14 }} />}
+              onClick={() => navigate(`/projects/${projectId}/board`)}
+              sx={{ color: COLORS.blue, fontWeight: 700, textTransform: 'none', fontSize: 12, borderRadius: 1.5, '&:hover': { bgcolor: COLORS.blueDark, color: '#fff' } }}
+            >
+              Show all tasks
+            </Button>
+          </Stack>
+        ) : <Box />}
+
+        <Stack direction="row" spacing={0.5}>
           <Button
+            variant={viewMode === 'board' ? 'contained' : 'outlined'}
             size="small"
-            startIcon={<CloseIcon sx={{ fontSize: 14 }} />}
-            onClick={() => navigate(`/projects/${projectId}/board`)}
+            startIcon={<ViewKanbanIcon />}
+            onClick={() => setViewMode('board')}
             sx={{
-              color: COLORS.blue,
-              fontWeight: 700,
-              textTransform: 'none',
-              fontSize: 12,
-              borderRadius: 1.5,
-              '&:hover': { bgcolor: COLORS.blueDark, color: '#fff' },
+              textTransform: 'none', fontWeight: 700, borderRadius: 2,
+              bgcolor: viewMode === 'board' ? COLORS.blue : 'transparent',
+              borderColor: COLORS.blue, color: viewMode === 'board' ? '#fff' : COLORS.blue,
+              '&:hover': { bgcolor: COLORS.blueDark, color: '#fff' }
             }}
           >
-            Show all tasks
+            Board
+          </Button>
+          <Button
+            variant={viewMode === 'list' ? 'contained' : 'outlined'}
+            size="small"
+            startIcon={<ViewListIcon />}
+            onClick={() => setViewMode('list')}
+            sx={{
+              textTransform: 'none', fontWeight: 700, borderRadius: 2,
+              bgcolor: viewMode === 'list' ? COLORS.blue : 'transparent',
+              borderColor: COLORS.blue, color: viewMode === 'list' ? '#fff' : COLORS.blue,
+              '&:hover': { bgcolor: COLORS.blueDark, color: '#fff' }
+            }}
+          >
+            List
           </Button>
         </Stack>
+      </Stack>
+
+      {/* Board View */}
+      {viewMode === 'board' && (
+        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, overflowX: 'auto', pb: 2, alignItems: 'flex-start' }}>
+          {COLUMNS.map((column) => (
+            <Column key={column.id} column={column} tasks={STATUS[column.id] ?? []} navigate={navigate} />
+          ))}
+        </Box>
       )}
 
-      {/* Board */}
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        gap: 2,
-        overflowX: 'auto',
-        pb: 2,
-        alignItems: 'flex-start',
-      }}>
-        {COLUMNS.map((column) => (
-          <Column
-            key={column.id}
-            column={column}
-            tasks={STATUS[column.id] ?? []}
-          />
-        ))}
-      </Box>
+      {/* List View */}
+      {viewMode === 'list' && (
+        <KanbanListView
+          objectives={objectives}
+          tasks={tasks}
+          navigate={navigate}
+          accessToken={accessToken}
+          objectiveFilter={objectiveFilter}
+          onTaskCreated={(task) => setTasks((prev) => [...prev, task])}
+          onTaskDeleted={(taskId) => setTasks((prev) => prev.filter((t) => t.id !== taskId))}
+        />
+      )}
     </PageContainer>
   )
 }

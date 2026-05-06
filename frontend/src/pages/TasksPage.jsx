@@ -30,7 +30,7 @@ import PageContainer from '../components/PageContainer'
 
 export const TasksPage = () => {
   const { accessToken } = useContext(AuthContext)
-  const { id } = useParams()
+  const { objectiveId } = useParams()
   const navigate = useNavigate()
 
   const [viewMode, setViewMode] = useState('list')
@@ -53,7 +53,7 @@ export const TasksPage = () => {
       try {
         setLoading(true)
         setError('')
-        const data = await getTasks(id, accessToken)
+        const data = await getTasks({ objective: objectiveId }, accessToken)
         setTasks(data)
       } catch (err) {
         setError(err.message)
@@ -62,7 +62,7 @@ export const TasksPage = () => {
       }
     }
     if (accessToken) loadTasks()
-  }, [accessToken, id])
+  }, [accessToken, objectiveId])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -81,7 +81,7 @@ export const TasksPage = () => {
           prev.map((task) => (task.id === savedTask.id ? savedTask : task))
         )
       } else {
-        savedTask = await createTask(id, formData, accessToken)
+        savedTask = await createTask(objectiveId, formData, accessToken)
         setTasks((prev) => [...prev, savedTask])
       }
 
