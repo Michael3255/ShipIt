@@ -1,6 +1,11 @@
+
+// Renders a single task card used in the Kanban board columns
+// Clicking a card navigates to the task detail page
+
 import React from 'react'
 import { Card, CardContent, Typography, Stack, Chip, Box } from '@mui/material'
 
+// ─── Design Tokens ────────────────────────────────────────────────
 const COLORS = {
   blue:      '#1B6FEB',
   blueLight: '#EBF2FF',
@@ -11,6 +16,7 @@ const COLORS = {
 export function TaskCard({ task, navigate }) {
   return (
     <Card
+      // Navigate to task detail page on click
       onClick={() => navigate(`/tasks/${task.id}`)}
       sx={{
         border: `1.5px solid ${COLORS.border}`,
@@ -26,9 +32,12 @@ export function TaskCard({ task, navigate }) {
       }}
     >
       <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
+        {/* Task title */}
         <Typography sx={{ fontWeight: 600, fontSize: 13, color: 'text.primary', mb: 0.5, lineHeight: 1.3 }}>
           {task.title}
         </Typography>
+
+        {/* Task description */}
         {task.description && (
           <Typography sx={{
             fontSize: 11, color: 'text.secondary', mb: 1, lineHeight: 1.4,
@@ -37,7 +46,10 @@ export function TaskCard({ task, navigate }) {
             {task.description}
           </Typography>
         )}
+
+        {/*  objective chip + assigned user avatar */}
         <Stack direction="row" justifyContent="space-between" alignItems="center">
+          {/* Objective label */}
           <Chip
             label={task.objective_detail?.title || 'No Objective'}
             size="small"
@@ -46,6 +58,8 @@ export function TaskCard({ task, navigate }) {
               maxWidth: 140, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
             }}
           />
+
+          {/* Assigned user avatar shows first letter of username */}
           <Box sx={{
             width: 24, height: 24, borderRadius: '50%',
             bgcolor: COLORS.teal, display: 'flex', alignItems: 'center', justifyContent: 'center',

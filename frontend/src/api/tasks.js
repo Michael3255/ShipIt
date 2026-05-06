@@ -12,8 +12,9 @@ export async function getTask(taskId, accessToken) {
   return data;
 }
 
-export async function getTasks(objectiveId, accessToken) {
-  const response = await fetch(`${BASE_URL}/?objective=${objectiveId}`, {
+export async function getTasks(filters = {}, accessToken) {
+  const params = new URLSearchParams(filters)
+  const response = await fetch(`${BASE_URL}/?${params}`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
@@ -64,16 +65,4 @@ export async function deleteTask(taskId, accessToken) {
     const data = await response.json();
     throw new Error(data.detail || "Failed to delete task");
   }
-}
-
-export async function getTasksByProject(projectId, accessToken) {
-  const response = await fetch(`http://127.0.0.1:8000/api/tasks/?project=${projectId}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || "Failed to fetch tasks");
-  return data;
 }

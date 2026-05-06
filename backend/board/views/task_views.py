@@ -9,13 +9,18 @@ class TaskListCreateView(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
 
     def get_queryset(self):
+        queryset = Task.objects.filter(
+            objective__project__team=self.request.user.team
+        )
         objective_id = self.request.query_params.get('objective')
         project_id = self.request.query_params.get('project')
+
         if objective_id:
-            return Task.objects.filter(objective=objective_id)
+            queryset = queryset.filter(objective__id=objective_id)
         if project_id:
-            return Task.objects.filter(objective__project=project_id)
-        return Task.objects.filter(objective__project__team=self.request.user.team)
+            queryset = queryset.filter(objective__project__id=project_id)
+        
+        return queryset
 
     def get_serializer_context(self):
         return {"request": self.request}

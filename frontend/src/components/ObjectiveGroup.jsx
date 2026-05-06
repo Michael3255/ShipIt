@@ -1,3 +1,8 @@
+
+// Renders a collapsible group of tasks under a single objective
+// Used in the Kanban list view — one group per objective
+// Task creation and deletion
+
 import React, { useState } from 'react'
 import {
   Box, Card, CardContent, Stack, Typography, Chip, Button,
@@ -11,6 +16,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { createTask, deleteTask } from '../api/tasks'
 
+// ─── Design Tokens ────────────────────────────────────────────────
 const COLORS = {
   blue:      '#1B6FEB',
   blueDark:  '#1358C4',
@@ -22,12 +28,17 @@ const COLORS = {
 }
 
 export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTaskDeleted, accessToken }) {
+  // Controls whether the group is expanded or collapsed
   const [expanded, setExpanded] = useState(true)
+  // Controls whether the inline add task form is visible
   const [showForm, setShowForm] = useState(false)
+  // Tracks which task is pending deletion confirmation
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+  // Form state for creating a new task
   const [formData, setFormData] = useState({ title: '', description: '', status: 'To Do', due_date: '' })
   const [error, setError] = useState('')
 
+  // Creates a new task under this objective and notifies parent
   async function handleCreateTask(e) {
     e.preventDefault()
     try {
@@ -40,6 +51,7 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
     }
   }
 
+  // Deletes a task and notifies parent to remove it from state
   async function handleDelete(taskId) {
     try {
       await deleteTask(taskId, accessToken)
@@ -54,17 +66,21 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
     <Card sx={{ mb: 2, border: `1.5px solid ${COLORS.border}`, borderRadius: 2, boxShadow: 'none' }}>
       <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
 
-        {/* Objective Header */}
+        {/* ── Objective Header — click to expand/collapse ── */}
         <Stack
           direction="row" justifyContent="space-between" alignItems="center"
           sx={{ px: 2, py: 1.5, bgcolor: COLORS.surface, borderBottom: `1px solid ${COLORS.border}`, cursor: 'pointer' }}
           onClick={() => setExpanded(!expanded)}
         >
           <Stack direction="row" alignItems="center" spacing={1}>
+            {/* Expand/collapse icon */}
             {expanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
             <Typography sx={{ fontWeight: 700, fontSize: 14 }}>{objective.title}</Typography>
+            {/* Task count badge */}
             <Chip label={tasks.length} size="small" sx={{ bgcolor: COLORS.blueLight, color: COLORS.blue, fontWeight: 700, fontSize: 11, height: 20 }} />
           </Stack>
+
+          {/* Task Button */}
           <Button
             size="small" startIcon={<AddIcon />}
             onClick={(e) => { e.stopPropagation(); setShowForm(!showForm); setExpanded(true) }}
@@ -74,10 +90,11 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
           </Button>
         </Stack>
 
+        {/* ── Collapsible content ── */}
         <Collapse in={expanded}>
           {error && <Alert severity="error" sx={{ m: 2 }}>{error}</Alert>}
 
-          {/* Inline Add Form */}
+          {/* ── Inline Add Task Form ── */}
           {showForm && (
             <Box component="form" onSubmit={handleCreateTask} sx={{ p: 2, bgcolor: COLORS.blueLight, borderBottom: `1px solid ${COLORS.border}` }}>
               <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
@@ -113,7 +130,7 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
             </Box>
           )}
 
-          {/* Task Table */}
+          {/* ── Task Table and message for no tasks ── */}
           {tasks.length === 0 && !showForm ? (
             <Box sx={{ py: 3, textAlign: 'center' }}>
               <Typography sx={{ fontSize: 13, color: 'text.disabled' }}>No tasks yet</Typography>
@@ -133,6 +150,7 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
                 <TableBody>
                   {tasks.map((task) => (
                     <TableRow key={task.id} sx={{ '&:hover': { bgcolor: COLORS.blueLight } }}>
+                      {/* Title — click to go to task detail */}
                       <TableCell
                         sx={{ fontWeight: 600, color: COLORS.blue, cursor: 'pointer' }}
                         onClick={() => navigate(`/tasks/${task.id}`)}
@@ -140,6 +158,8 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
                         {task.title}
                       </TableCell>
                       <TableCell sx={{ fontSize: 13, color: 'text.secondary' }}>{task.description || '-'}</TableCell>
+
+                      {/* Status */}
                       <TableCell>
                         <Chip
                           label={task.status}
@@ -152,11 +172,15 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
                         />
                       </TableCell>
                       <TableCell sx={{ fontSize: 13 }}>{task.due_date || '-'}</TableCell>
+
+                      {/* Edit and Delete with confirmation */}
                       <TableCell>
                         <Stack direction="row" alignItems="center" spacing={0.5}>
                           <IconButton size="small" onClick={() => navigate(`/tasks/${task.id}`)} sx={{ color: COLORS.blue }}>
                             <ModeEditIcon fontSize="small" />
                           </IconButton>
+
+                          {/*  delete confirmation */}
                           {confirmDeleteId === task.id ? (
                             <Stack direction="row" alignItems="center" spacing={0.5}>
                               <Typography variant="caption">Delete?</Typography>

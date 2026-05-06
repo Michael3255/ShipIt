@@ -53,7 +53,7 @@ export const TasksPage = () => {
       try {
         setLoading(true)
         setError('')
-        const data = await getTasks(objectiveId, accessToken)
+        const data = await getTasks({ objective: objectiveId }, accessToken)
         setTasks(data)
       } catch (err) {
         setError(err.message)

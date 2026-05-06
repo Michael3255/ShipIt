@@ -3,7 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import AuthContext from '../context/AuthContext'
 import { getProject } from '../api/projects'
 import { getObjectives } from '../api/objectives'
-import { getTasksByProject } from '../api/tasks'
+import { getTasks } from '../api/tasks'
 import { TaskCard } from './TaskCard'
 import { KanbanListView } from './KanbanListView'
 import PageContainer from './PageContainer'
@@ -51,6 +51,7 @@ function Column({ column, tasks, navigate }) {
       p: 1.5,
       gap: 1,
     }}>
+      {/* Column header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={0.5}>
         <Typography sx={{ fontWeight: 700, fontSize: 13, color: 'text.primary', textTransform: 'uppercase', letterSpacing: 0.8 }}>
           {column.label}
@@ -61,6 +62,7 @@ function Column({ column, tasks, navigate }) {
           sx={{ bgcolor: meta.chipBg, color: meta.chipColor, fontWeight: 700, fontSize: 11, height: 20 }}
         />
       </Stack>
+      {/* Task cards */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minHeight: 80 }}>
         {tasks.length === 0 ? (
           <Box sx={{
@@ -77,7 +79,7 @@ function Column({ column, tasks, navigate }) {
     </Box>
   )
 }
-
+// ─── Main Component ───────────────────────────────────────────────
 export const KanbanBoard = () => {
   const { projectId }          = useParams()
   const [searchParams]         = useSearchParams()
@@ -91,7 +93,7 @@ export const KanbanBoard = () => {
   const [loading, setLoading]       = useState(true)
   const [error, setError]           = useState('')
   const [viewMode, setViewMode]     = useState('board')
-
+// Fetch project title and objectives for breadcrumb + filter label
   useEffect(() => {
     async function load() {
       try {
@@ -99,7 +101,7 @@ export const KanbanBoard = () => {
         const [projectData, objectivesData, tasksData] = await Promise.all([
           getProject(projectId, accessToken),
           getObjectives(projectId, accessToken),
-          getTasksByProject(projectId, accessToken),
+          getTasks({ project: projectId }, accessToken),
         ])
         setProject(projectData)
         setObjectives(objectivesData)
@@ -112,15 +114,15 @@ export const KanbanBoard = () => {
     }
     if (accessToken && projectId) load()
   }, [projectId, accessToken])
-
+ // Derive active objective name for breadcrumb
   const activeObjective = objectives.find((o) => String(o.id) === String(objectiveFilter))
-
+// Filter tasks
   const displayTasks = objectiveFilter
     ? tasks.filter((task) => String(task.objective) === String(objectiveFilter))
     : tasks
 
   const STATUS = Object.groupBy(displayTasks, ({ status }) => status)
-
+// Breadcrumbs
   const breadcrumbs = [
     { title: 'Projects', path: '/projects' },
     { title: project?.title ?? 'Project', path: `/projects/${projectId}` },
