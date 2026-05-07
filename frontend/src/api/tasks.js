@@ -49,7 +49,9 @@ export async function editTask(taskId, formData, accessToken) {
     },
     body: JSON.stringify(formData),
   });
+
   const data = await response.json();
+  console.log(data);
   if (!response.ok) throw new Error(data.detail || "Failed to edit task");
   return data;
 }
