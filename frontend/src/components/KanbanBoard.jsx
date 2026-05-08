@@ -458,24 +458,36 @@ export const KanbanBoard = () => {
 
       {/* View toggle + filter banner */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        {objectiveFilter ? (
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{
-            px: 2, py: 1, bgcolor: COLORS.blueLight,
-            border: `1.5px solid ${COLORS.blue}`, borderRadius: 2, flex: 1, mr: 2
-          }}>
-            <FilterListIcon sx={{ fontSize: 16, color: COLORS.blue }} />
-            <Typography sx={{ fontSize: 13, fontWeight: 600, color: COLORS.blue, flex: 1 }}>
-              Showing tasks for: {activeObjective?.title ?? `Objective ${objectiveFilter}`}
-            </Typography>
-            <Button size="small" startIcon={<CloseIcon sx={{ fontSize: 14 }} />}
-              onClick={() => navigate(`/projects/${projectId}/board`)}
-              sx={{ color: COLORS.blue, fontWeight: 700, textTransform: 'none', fontSize: 12, borderRadius: 1.5, '&:hover': { bgcolor: COLORS.blueDark, color: '#fff' } }}
-            >
-              Show all tasks
-            </Button>
-          </Stack>
-        ) : <Box />}
+        {/* Objective filter dropdown — always visible */}
+        <Stack direction="row" alignItems="center" spacing={1.5}>
+          <FilterListIcon sx={{ fontSize: 16, color: COLORS.blue }} />
+          <select
+            value={objectiveFilter || ''}
+            onChange={(e) => {
+              const val = e.target.value
+              if (val) {
+                navigate(`/projects/${projectId}/board?objective=${val}`)
+              } else {
+                navigate(`/projects/${projectId}/board`)
+              }
+            }}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '8px',
+              border: `1.5px solid ${COLORS.border}`,
+              fontSize: '13px',
+              fontWeight: 600,
+              color: COLORS.blue,
+            }}
+          >
+            <option value="">All Objectives</option>
+            {objectives.map((obj) => (
+              <option key={obj.id} value={obj.id}>{obj.title}</option>
+            ))}
+          </select>
+        </Stack>
 
+        {/* View toggle buttons */}
         <Stack direction="row" spacing={0.5}>
           <Button
             variant={viewMode === 'board' ? 'contained' : 'outlined'}

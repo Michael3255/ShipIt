@@ -14,7 +14,6 @@ export async function getTask(taskId, accessToken) {
 
 export async function getTasks(filters = {}, accessToken) {
   const params = new URLSearchParams(filters);
-
   const response = await fetch(`${BASE_URL}/?${params}`, {
     headers: {
       "Content-Type": "application/json",
