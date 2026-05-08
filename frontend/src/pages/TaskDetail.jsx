@@ -31,7 +31,7 @@ import Chip from '@mui/material/Chip'
 import PageContainer from '../components/PageContainer'
 
 export const TaskDetail = () => {
-  const { accessToken } = useContext(AuthContext)
+  const { authFetch } = useContext(AuthContext)
   const { taskId } = useParams()
 
   const [viewMode, setViewMode] = useState('list')
@@ -49,21 +49,21 @@ export const TaskDetail = () => {
   useEffect(() => {
     async function loadTask() {
       try {
-        const data = await getTask(taskId, accessToken)
+        const data = await getTask(taskId, authFetch)
         setTask(data)
       } catch (err) {
         setError(err.message)
       }
     }
-    if (accessToken) loadTask()
-  }, [accessToken, taskId])
+    if (authFetch) loadTask()
+  }, [authFetch, taskId])
 
   useEffect(() => {
     async function loadComments() {
       try {
         setLoading(true)
         setError('')
-        const data = await getComments(taskId, accessToken)
+        const data = await getComments(taskId, authFetch)
         setComments(data)
       } catch (err) {
         setError(err.message)
@@ -71,8 +71,8 @@ export const TaskDetail = () => {
         setLoading(false)
       }
     }
-    if (accessToken) loadComments()
-  }, [accessToken, taskId])
+    if (authFetch) loadComments()
+  }, [authFetch, taskId])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -86,12 +86,12 @@ export const TaskDetail = () => {
       let savedComment
 
       if (viewMode === 'edit' && selectedComment) {
-        savedComment = await editComment(selectedComment.id, formData, accessToken)
+        savedComment = await editComment(selectedComment.id, formData, authFetch)
         setComments((prev) =>
           prev.map((comment) => (comment.id === savedComment.id ? savedComment : comment))
         )
       } else {
-        savedComment = await createComment(taskId, formData, accessToken)
+        savedComment = await createComment(taskId, formData, authFetch)
         setComments((prev) => [...prev, savedComment])
       }
 
@@ -106,7 +106,7 @@ export const TaskDetail = () => {
   async function handleDelete(commentId) {
     setError('')
     try {
-      await deleteComment(commentId, accessToken)
+      await deleteComment(commentId, authFetch)
       setComments((prev) => prev.filter((comment) => comment.id !== commentId))
       if (selectedComment && selectedComment.id === commentId) {
         setSelectedComment(null)

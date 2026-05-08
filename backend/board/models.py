@@ -12,13 +12,14 @@ STATUS_CHOICES = [
 
 
 class Project(models.Model):
-    title = models.CharField(max_length=50, unique=True)
+    title = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='projects'
     )
+
 
     team = models.ForeignKey(
         Team,
@@ -29,6 +30,10 @@ class Project(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['title', 'team'] # changed from Unique=True to together so users on different teams
+                                            # can have the same title as another teams project Michael 5/8/2026
 
     def __str__(self):
         return self.title

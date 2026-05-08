@@ -88,8 +88,11 @@ function EmptyState({ onAdd }) {
   )
 }
 
+
+
 // ─── Project Form ─────────────────────────────────────────────────
-function ProjectForm({ viewMode, formData, handleChange, handleSubmit, onBack, onCancel, isFormValid }) {
+// ─── Project Form ─────────────────────────────────────────────────
+function ProjectForm({ viewMode, formData, handleChange, handleSubmit, onBack, onCancel, isFormValid, error }) {
   return (
     <PageContainer
       title={viewMode === 'edit' ? 'Edit Project' : 'New Project'}
@@ -109,6 +112,7 @@ function ProjectForm({ viewMode, formData, handleChange, handleSubmit, onBack, o
           bgcolor: 'background.paper',
         }}
       >
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         <FormGroup>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -182,7 +186,7 @@ function ProjectForm({ viewMode, formData, handleChange, handleSubmit, onBack, o
 
 // ─── Main Component ───────────────────────────────────────────────
 export const ProjectsPage = () => {
-  const { accessToken } = useContext(AuthContext)
+  const { authFetch } = useContext(AuthContext)
   const navigate = useNavigate()
 
   const [viewMode, setViewMode]           = useState('list')
@@ -198,7 +202,7 @@ export const ProjectsPage = () => {
       try {
         setLoading(true)
         setError('')
-        const data = await getProjects(accessToken)
+        const data = await getProjects(authFetch)
         setProjects(data)
       } catch (err) {
         setError(err.message)
@@ -206,8 +210,8 @@ export const ProjectsPage = () => {
         setLoading(false)
       }
     }
-    if (accessToken) loadProjects()
-  }, [accessToken])
+    if (authFetch) loadProjects()
+  }, [authFetch])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -220,10 +224,10 @@ export const ProjectsPage = () => {
     try {
       let savedProject
       if (viewMode === 'edit' && selectedProject) {
-        savedProject = await editProject(selectedProject.id, formData, accessToken)
+        savedProject = await editProject(selectedProject.id, formData, authFetch)
         setProjects((prev) => prev.map((p) => p.id === savedProject.id ? savedProject : p))
       } else {
-        savedProject = await createProject(formData, accessToken)
+        savedProject = await createProject(formData, authFetch)
         setProjects((prev) => [...prev, savedProject])
       }
       resetForm()
@@ -236,7 +240,7 @@ export const ProjectsPage = () => {
   async function handleDelete(projectId) {
     setError('')
     try {
-      await deleteProject(projectId, accessToken)
+      await deleteProject(projectId, authFetch)
       setProjects((prev) => prev.filter((p) => p.id !== projectId))
       if (selectedProject?.id === projectId) {
         setSelectedProject(null)
@@ -267,6 +271,7 @@ export const ProjectsPage = () => {
         onBack={() => setViewMode('list')}
         onCancel={() => { resetForm(); setViewMode('list') }}
         isFormValid={isFormValid}
+        error={error}
       />
     )
   }

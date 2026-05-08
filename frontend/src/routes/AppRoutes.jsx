@@ -12,6 +12,7 @@ import { KanbanBoard } from "../components/KanbanBoard";
 import Dashboard from "../pages/Dashboard";
 import Layout from "../components/Layout"
 import { TeamDetail } from "../pages/TeamDetail";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 function AppRoutes() {
     return (
@@ -24,8 +25,12 @@ function AppRoutes() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
-            {/* With Header */}
-            <Route element={<Layout />}>
+            {/* Protected routes — redirects to login if not authenticated */}
+            <Route element={
+                <ProtectedRoute>
+                    <Layout />
+                </ProtectedRoute>
+            }>
                 {/* Dashboard */}
                 <Route path="/dashboard" element={<Dashboard />} />
                 

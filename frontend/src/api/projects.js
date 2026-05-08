@@ -1,81 +1,57 @@
 const BASE_URL = "http://127.0.0.1:8000/api/projects";
 
-export async function getProjects(accessToken) {
-  const response = await fetch(`${BASE_URL}/`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.detail || "Failed to fetch projects");
-  }
-  return data;
+export async function getProjects(authFetch) {
+  const response = await authFetch(`${BASE_URL}/`)
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to fetch projects")
+  return data
 }
 
-export async function getProject(projectId, accessToken) {
-  const response = await fetch(`${BASE_URL}/${projectId}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.detail || "Failed to fetch project");
-  }
-  return data;
-}
-
-export async function createProject(formData, accessToken) {
-  const response = await fetch(`${BASE_URL}/`, {
+export async function createProject(formData, authFetch) {
+  const response = await authFetch(`${BASE_URL}/`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
     body: JSON.stringify(formData),
-  });
-
-  const data = await response.json();
+  })
+  
+  const contentType = response.headers.get("content-type")
+  const data = contentType && contentType.includes("application/json")
+    ? await response.json()
+    : await response.text()
 
   if (!response.ok) {
-    throw new Error(data.detail || "Failed to create project");
+    if (typeof data === 'object') {
+      // extract the specific field error if it exists
+      const message = data.title?.[0] || data.detail || "Failed to create project"
+      throw new Error(message)
+    }
+    throw new Error("Failed to create project: Does the project already exist?")
   }
-  return data;
+  return data
 }
 
-export async function editProject(projectId, formData, accessToken) {
-  const response = await fetch(`${BASE_URL}/${projectId}/`, {
+export async function editProject(projectId, formData, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${projectId}/`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
     body: JSON.stringify(formData),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) throw new Error(data.detail || "Failed to edit project.");
-  return data;
+  })
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to edit project")
+  return data
 }
 
-export async function deleteProject(projectId, accessToken) {
-  const response = await fetch(`${BASE_URL}/${projectId}/`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+export async function getProject(projectId, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${projectId}/`)
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to fetch project")
+  return data
+}
 
+export async function deleteProject(projectId, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${projectId}/`, {
+    method: "DELETE",
+  })
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.detail || "Failed to delete project");
+    const data = await response.json()
+    throw new Error(data.detail || "Failed to delete project")
   }
 }

@@ -1,70 +1,46 @@
 const BASE_URL = "http://127.0.0.1:8000/api/tasks";
 
-export async function getTask(taskId, accessToken) {
-  const response = await fetch(`${BASE_URL}/${taskId}/`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || "Failed to fetch task");
-  return data;
+export async function getTask(taskId, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${taskId}/`)
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to fetch task")
+  return data
 }
 
-export async function getTasks(filters = {}, accessToken) {
-  const params = new URLSearchParams(filters);
-  const response = await fetch(`${BASE_URL}/?${params}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || "Failed to fetch tasks");
-  return data;
+export async function getTasks(filters = {}, authFetch) {
+  const params = new URLSearchParams(filters)
+  const response = await authFetch(`${BASE_URL}/?${params}`)
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to fetch tasks")
+  return data
 }
 
-export async function createTask(objectiveId, formData, accessToken) {
-  const response = await fetch(`${BASE_URL}/`, {
+export async function createTask(objectiveId, formData, authFetch) {
+  const response = await authFetch(`${BASE_URL}/`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
     body: JSON.stringify({ ...formData, objective: objectiveId }),
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || "Failed to create task");
-  return data;
+  })
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to create task")
+  return data
 }
 
-export async function editTask(taskId, formData, accessToken) {
-  const response = await fetch(`${BASE_URL}/${taskId}/`, {
+export async function editTask(taskId, formData, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${taskId}/`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
     body: JSON.stringify(formData),
-  });
-
-  const data = await response.json();
-  console.log(data);
-  if (!response.ok) throw new Error(data.detail || "Failed to edit task");
-  return data;
+  })
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to edit task")
+  return data
 }
 
-export async function deleteTask(taskId, accessToken) {
-  const response = await fetch(`${BASE_URL}/${taskId}/`, {
+export async function deleteTask(taskId, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${taskId}/`, {
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  })
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.detail || "Failed to delete task");
+    const data = await response.json()
+    throw new Error(data.detail || "Failed to delete task")
   }
 }

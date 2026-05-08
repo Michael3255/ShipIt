@@ -29,7 +29,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import PageContainer from '../components/PageContainer'
 
 export const TasksPage = () => {
-  const { accessToken } = useContext(AuthContext)
+  const { authFetch } = useContext(AuthContext)
   const { objectiveId } = useParams()
   const navigate = useNavigate()
 
@@ -53,7 +53,7 @@ export const TasksPage = () => {
       try {
         setLoading(true)
         setError('')
-        const data = await getTasks({ objective: objectiveId }, accessToken)
+        const data = await getTasks({ objective: objectiveId }, authFetch)
         setTasks(data)
       } catch (err) {
         setError(err.message)
@@ -61,8 +61,8 @@ export const TasksPage = () => {
         setLoading(false)
       }
     }
-    if (accessToken) loadTasks()
-  }, [accessToken, objectiveId])
+    if (authFetch) loadTasks()
+  }, [authFetch, objectiveId])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -76,12 +76,12 @@ export const TasksPage = () => {
       let savedTask
 
       if (viewMode === 'edit' && selectedTask) {
-        savedTask = await editTask(selectedTask.id, formData, accessToken)
+        savedTask = await editTask(selectedTask.id, formData, authFetch)
         setTasks((prev) =>
           prev.map((task) => (task.id === savedTask.id ? savedTask : task))
         )
       } else {
-        savedTask = await createTask(objectiveId, formData, accessToken)
+        savedTask = await createTask(objectiveId, formData, authFetch)
         setTasks((prev) => [...prev, savedTask])
       }
 
@@ -96,7 +96,7 @@ export const TasksPage = () => {
   async function handleDelete(taskId) {
     setError('')
     try {
-      await deleteTask(taskId, accessToken)
+      await deleteTask(taskId, authFetch)
       setTasks((prev) => prev.filter((task) => task.id !== taskId))
       if (selectedTask && selectedTask.id === taskId) {
         setSelectedTask(null)
