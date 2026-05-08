@@ -458,24 +458,41 @@ export const KanbanBoard = () => {
 
       {/* View toggle + filter banner */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        {objectiveFilter ? (
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{
-            px: 2, py: 1, bgcolor: COLORS.blueLight,
-            border: `1.5px solid ${COLORS.blue}`, borderRadius: 2, flex: 1, mr: 2
-          }}>
-            <FilterListIcon sx={{ fontSize: 16, color: COLORS.blue }} />
-            <Typography sx={{ fontSize: 13, fontWeight: 600, color: COLORS.blue, flex: 1 }}>
-              Showing tasks for: {activeObjective?.title ?? `Objective ${objectiveFilter}`}
-            </Typography>
-            <Button size="small" startIcon={<CloseIcon sx={{ fontSize: 14 }} />}
-              onClick={() => navigate(`/projects/${projectId}/board`)}
-              sx={{ color: COLORS.blue, fontWeight: 700, textTransform: 'none', fontSize: 12, borderRadius: 1.5, '&:hover': { bgcolor: COLORS.blueDark, color: '#fff' } }}
+        {/* Objective filter dropdown — always visible */}
+        <Stack direction="row" alignItems="center" spacing={1.5}>
+          <FilterListIcon sx={{ fontSize: 16, color: COLORS.blue }} />
+          <FormControl size="small">
+            <Select
+              value={objectiveFilter || ''}
+              onChange={(e) => {
+                const val = e.target.value
+                if (val) {
+                  navigate(`/projects/${projectId}/board?objective=${val}`)
+                } else {
+                  navigate(`/projects/${projectId}/board`)
+                }
+              }}
+              displayEmpty
+              sx={{
+                borderRadius: 2,
+                fontWeight: 700,
+                fontSize: 13,
+                color: COLORS.blue,
+                minWidth: 160,
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: COLORS.blue, borderWidth: '1.5px' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: COLORS.blueDark },
+                '& .MuiSelect-icon': { color: COLORS.blue },
+              }}
             >
-              Show all tasks
-            </Button>
-          </Stack>
-        ) : <Box />}
+              <MenuItem value="">All Objectives</MenuItem>
+              {objectives.map((obj) => (
+                <MenuItem key={obj.id} value={String(obj.id)}>{obj.title}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
 
+        {/* View toggle buttons */}
         <Stack direction="row" spacing={0.5}>
           <Button
             variant={viewMode === 'board' ? 'contained' : 'outlined'}
@@ -511,7 +528,10 @@ export const KanbanBoard = () => {
       {/* List View */}
       {viewMode === 'list' && (
         <KanbanListView
-          objectives={objectives}
+          objectives={objectiveFilter 
+            ? objectives.filter((o) => String(o.id) === String(objectiveFilter))
+            : objectives
+          }
           tasks={tasks}
           navigate={navigate}
           accessToken={accessToken}
