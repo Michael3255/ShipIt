@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import AuthContext from '../context/AuthContext'
 import { getTeams, createTeam, editTeam, deleteTeam } from '../api/teams'
+import { Link } from 'react-router-dom'
 
 import Container from '@mui/material/Container'
 import Button from '@mui/material/Button'
@@ -186,7 +187,20 @@ export const TeamsPage = () => {
                           <ModeEditIcon />
                         </IconButton>
 
-                        <Typography>{team.title}</Typography>
+                        <Typography
+                          component={Link}
+                          to={`/teams/${team.id}`}
+                          sx={{
+                            textDecoration: 'none',
+                            color: 'primary.main',
+                            fontWeight: 600,
+                            '&:hover': {
+                              textDecoration: 'underline',
+                            },
+                          }}
+                        >
+                          {team.title}
+                        </Typography>
                       </Box>
                     </TableCell>
 

@@ -11,6 +11,7 @@ import { TeamsPage } from "../pages/TeamsPage";
 import { KanbanBoard } from "../components/KanbanBoard";
 import Dashboard from "../pages/Dashboard";
 import Layout from "../components/Layout"
+import { TeamDetail } from "../pages/TeamDetail";
 
 function AppRoutes() {
     return (
@@ -30,6 +31,9 @@ function AppRoutes() {
                 
                 {/* Teams */}
                 <Route path="/teams" element={<TeamsPage />} />
+
+                {/* Team Members */}
+                <Route path="/teams/:teamId" element={<TeamDetail />} />
                 
                 {/* Project list */}
                 <Route path="/projects" element={<ProjectsPage />} />
