@@ -27,7 +27,7 @@ const COLORS = {
   surface:   '#F7F9FC',
 }
 
-export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTaskDeleted, accessToken }) {
+export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTaskDeleted, authFetch }) {
   // Controls whether the group is expanded or collapsed
   const [expanded, setExpanded] = useState(true)
   // Controls whether the inline add task form is visible
@@ -42,7 +42,7 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
   async function handleCreateTask(e) {
     e.preventDefault()
     try {
-      const saved = await createTask(objective.id, formData, accessToken)
+      const saved = await createTask(objective.id, formData, authFetch)
       onTaskCreated(saved)
       setFormData({ title: '', description: '', status: 'To Do', due_date: '' })
       setShowForm(false)
@@ -54,7 +54,7 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
   // Deletes a task and notifies parent to remove it from state
   async function handleDelete(taskId) {
     try {
-      await deleteTask(taskId, accessToken)
+      await deleteTask(taskId, authFetch)
       onTaskDeleted(taskId)
       setConfirmDeleteId(null)
     } catch (err) {

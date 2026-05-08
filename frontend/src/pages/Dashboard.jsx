@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AuthContext from "../context/AuthContext";
-import { getTeams } from "../api/teams";
+import { getTeamsAuth } from "../api/teams"
 import { getProjects } from "../api/projects";
 
 import Container from "@mui/material/Container";
@@ -18,7 +18,7 @@ import Toolbar from "@mui/material/Toolbar";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { accessToken } = useContext(AuthContext);
+  const { authFetch } = useContext(AuthContext);
 
   const [teamCount, setTeamCount] = useState(0);
   const [projectCount, setProjectCount] = useState(0);
@@ -31,8 +31,8 @@ export default function Dashboard() {
         setLoading(true);
         setError("");
 
-        const teams = await getTeams(accessToken);
-        const projects = await getProjects(accessToken);
+        const teams = await getTeamsAuth(authFetch);
+        const projects = await getProjects(authFetch);
 
         setTeamCount(teams.length);
         setProjectCount(projects.length);
@@ -43,12 +43,12 @@ export default function Dashboard() {
       }
     }
 
-    if (accessToken) {
+    if (authFetch) {
       loadDashboardData();
     } else {
       setLoading(false);
     }
-  }, [accessToken]);
+  }, [authFetch]);
 
   return (
     <Container>

@@ -21,7 +21,7 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 export const TeamsPage = () => {
-  const { accessToken } = useContext(AuthContext)
+  const { authFetch } = useContext(AuthContext)
 
   const [teams, setTeams] = useState([])
   const [title, setTitle] = useState('')
@@ -37,7 +37,7 @@ export const TeamsPage = () => {
         setLoading(true)
         setError('')
 
-        const data = await getTeams(accessToken)
+        const data = await getTeams(authFetch)
         setTeams(data)
       } catch (err) {
         setError(err.message)
@@ -46,12 +46,12 @@ export const TeamsPage = () => {
       }
     }
 
-    if (accessToken) {
+    if (authFetch) {
       loadTeams()
     } else {
       setLoading(false)
     }
-  }, [accessToken])
+  }, [authFetch])
 
   async function handleSubmitTeam(event) {
     event.preventDefault()
@@ -64,7 +64,7 @@ export const TeamsPage = () => {
 
     try {
       if (isEditing && selectedTeam) {
-        const updatedTeam = await editTeam(selectedTeam.id, { title }, accessToken)
+        const updatedTeam = await editTeam(selectedTeam.id, { title }, authFetch)
 
         setTeams((prev) =>
           prev.map((team) =>
@@ -75,7 +75,7 @@ export const TeamsPage = () => {
         setSelectedTeam(null)
         setIsEditing(false)
       } else {
-        const newTeam = await createTeam({ title }, accessToken)
+        const newTeam = await createTeam({ title }, authFetch)
         setTeams((prev) => [...prev, newTeam])
       }
 
@@ -96,7 +96,7 @@ export const TeamsPage = () => {
     setError('')
 
     try {
-      await deleteTeam(teamId, accessToken)
+      await deleteTeam(teamId, authFetch)
       setTeams((prev) => prev.filter((team) => team.id !== teamId))
       setConfirmDeleteId(null)
 

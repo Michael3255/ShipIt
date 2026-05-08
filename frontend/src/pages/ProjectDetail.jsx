@@ -316,7 +316,7 @@ const inputSx = {
 // ─── Main Component ───────────────────────────────────────────────
 export const ProjectDetails = () => {
   const { projectId } = useParams()
-  const { accessToken } = useContext(AuthContext)
+  const { authFetch } = useContext(AuthContext)
   const navigate = useNavigate()
 
   const [project, setProject] = useState(null)
@@ -333,7 +333,7 @@ export const ProjectDetails = () => {
       try {
         setLoading(true)
         setError("")
-        const data = await getProject(projectId, accessToken)
+        const data = await getProject(projectId, authFetch)
         setProject(data)
       } catch (err) {
         setError(err.message)
@@ -341,15 +341,15 @@ export const ProjectDetails = () => {
         setLoading(false)
       }
     }
-    if (accessToken) loadProject()
-  }, [projectId, accessToken])
+    if (authFetch) loadProject()
+  }, [projectId, authFetch])
 
   useEffect(() => {
     async function loadObjectives() {
       try {
         setObjectivesLoading(true)
         setObjectivesError("")
-        const data = await getObjectives(projectId, accessToken)
+        const data = await getObjectives(projectId, authFetch)
         setObjectives(data)
       } catch (err) {
         setObjectivesError(err.message)
@@ -357,8 +357,8 @@ export const ProjectDetails = () => {
         setObjectivesLoading(false)
       }
     }
-    if (accessToken) loadObjectives()
-  }, [projectId, accessToken])
+    if (authFetch) loadObjectives()
+  }, [projectId, authFetch])
 
   function resetForm() {
     setObjectivesError("")
@@ -373,7 +373,7 @@ export const ProjectDetails = () => {
   async function handleSubmit(event) {
     event.preventDefault()
     try {
-      const savedObjective = await createObjective(projectId, formData, accessToken)
+      const savedObjective = await createObjective(projectId, formData, authFetch)
       setObjectives((prev) => [...prev, savedObjective])
       resetForm()
       setShowForm(false)

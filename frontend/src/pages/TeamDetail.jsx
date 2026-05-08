@@ -14,7 +14,7 @@ import Button from '@mui/material/Button'
 
 export const TeamDetail = () => {
   const { teamId } = useParams()
-  const { accessToken } = useContext(AuthContext)
+  const { authFetch } = useContext(AuthContext)
 
   const [team, setTeam] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -29,7 +29,7 @@ export const TeamDetail = () => {
 
         const response = await fetch(`http://127.0.0.1:8000/api/teams/${teamId}/`, {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${authFetch}`,
           },
         })
 
@@ -46,10 +46,10 @@ export const TeamDetail = () => {
       }
     }
 
-    if (accessToken) {
+    if (authFetch) {
       loadTeam()
     }
-  }, [teamId, accessToken])
+  }, [teamId, authFetch])
 
   async function handleJoinTeam() {
     try {
@@ -59,7 +59,7 @@ export const TeamDetail = () => {
       const response = await fetch(`http://127.0.0.1:8000/api/teams/${teamId}/join/`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${authFetch}`,
         },
       })
 
@@ -69,7 +69,7 @@ export const TeamDetail = () => {
 
       const updatedTeamResponse = await fetch(`http://127.0.0.1:8000/api/teams/${teamId}/`, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${authFetch}`,
         },
       })
 
@@ -92,7 +92,7 @@ export const TeamDetail = () => {
         const response = await fetch(`http://127.0.0.1:8000/api/teams/${teamId}/leave/`, {
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${authFetch}`,
         },
         })
 
@@ -102,7 +102,7 @@ export const TeamDetail = () => {
 
         const updatedTeamResponse = await fetch(`http://127.0.0.1:8000/api/teams/${teamId}/`, {
         headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${authFetch}`,
         },
         })
 

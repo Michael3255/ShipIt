@@ -1,30 +1,27 @@
 const BASE_URL = "http://127.0.0.1:8000/api/teams";
 
-function buildHeaders(accessToken) {
-  const headers = {
-    "Content-Type": "application/json",
-  };
+// getTeams uses accessToken because it's also called from register page
+// where the user may not be logged in yet
 
-  if (accessToken) {
-    headers.Authorization = `Bearer ${accessToken}`;
-  }
-  return headers;
-}
-
-export async function getTeams(accessToken = null) {
+// for unauthenticated use (register page)
+export async function getTeams() {
   const response = await fetch(`${BASE_URL}/`, {
-    headers: buildHeaders(accessToken),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.detail || "Failed to fetch teams");
-  }
-
-  return data;
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to fetch teams")
+  return data
 }
 
+// for authenticated use (dashboard, teams page)
+export async function getTeamsAuth(authFetch) {
+  const response = await authFetch(`${BASE_URL}/`)
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to fetch teams")
+  return data
+}
 export async function createTeam(formData) {
   const response = await fetch(`${BASE_URL}/`, {
     method: "POST",
@@ -32,47 +29,28 @@ export async function createTeam(formData) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(formData),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.detail || "Failed to create team");
-  }
-
-  return data;
+  })
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to create team")
+  return data
 }
 
-export async function editTeam(teamId, formData, accessToken) {
-  const response = await fetch(`http://127.0.0.1:8000/api/${teamId}/`, {
+export async function editTeam(teamId, formData, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${teamId}/`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
     body: JSON.stringify(formData),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.detail || "Failed to edit team");
-  }
-
-  return data;
+  })
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.detail || "Failed to edit team")
+  return data
 }
 
-export async function deleteTeam(teamId, accessToken) {
-  const response = await fetch(`http://127.0.0.1:8000/api/${teamId}/`, {
+export async function deleteTeam(teamId, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${teamId}/`, {
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
+  })
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.detail || "Failed to delete team");
+    const data = await response.json()
+    throw new Error(data.detail || "Failed to delete team")
   }
 }

@@ -29,7 +29,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import PageContainer from '../components/PageContainer'
 
 export const ObjectiveDetail = () => {
-  const { accessToken } = useContext(AuthContext)
+  const { authFetch } = useContext(AuthContext)
   const { id } = useParams()
   const navigate = useNavigate()
 
@@ -52,7 +52,7 @@ export const ObjectiveDetail = () => {
       try {
         setLoading(true)
         setError('')
-        const data = await getObjectives(id, accessToken)
+        const data = await getObjectives(id, authFetch)
         setObjectives(data)
       } catch (err) {
         setError(err.message)
@@ -60,8 +60,8 @@ export const ObjectiveDetail = () => {
         setLoading(false)
       }
     }
-    if (accessToken) loadObjectives()
-  }, [accessToken, id])
+    if (authFetch) loadObjectives()
+  }, [authFetch, id])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -75,12 +75,12 @@ export const ObjectiveDetail = () => {
       let savedObjective
 
       if (viewMode === 'edit' && selectedObjective) {
-        savedObjective = await editObjective(selectedObjective.id, formData, accessToken)
+        savedObjective = await editObjective(selectedObjective.id, formData, authFetch)
         setObjectives((prev) =>
           prev.map((obj) => (obj.id === savedObjective.id ? savedObjective : obj))
         )
       } else {
-        savedObjective = await createObjective(id, formData, accessToken)
+        savedObjective = await createObjective(id, formData, authFetch)
         setObjectives((prev) => [...prev, savedObjective])
       }
 
@@ -95,7 +95,7 @@ export const ObjectiveDetail = () => {
   async function handleDelete(objectiveId) {
     setError('')
     try {
-      await deleteObjective(objectiveId, accessToken)
+      await deleteObjective(objectiveId, authFetch)
       setObjectives((prev) => prev.filter((obj) => obj.id !== objectiveId))
       if (selectedObjective && selectedObjective.id === objectiveId) {
         setSelectedObjective(null)

@@ -308,7 +308,7 @@ export const KanbanBoard = () => {
   const { projectId }          = useParams()
   const [searchParams]         = useSearchParams()
   const navigate               = useNavigate()
-  const { accessToken }        = useContext(AuthContext)
+  const { authFetch }        = useContext(AuthContext)
   const objectiveFilter        = searchParams.get('objective')
   const sensors                = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 }}))
 
@@ -338,7 +338,7 @@ export const KanbanBoard = () => {
         status: activeColumn,
         objective: formData.objective || objectiveFilter,
       }
-      const savedTasks = await createTask(payload.objective, payload, accessToken)
+      const savedTasks = await createTask(payload.objective, payload, authFetch)
       setTasks((prev) => [...prev, savedTasks])
       setActiveColumn(null)
       setFormData({ title: "", description: "", status: "To Do", due_date: "", objective: objectiveFilter ?? ""})
@@ -371,7 +371,7 @@ export const KanbanBoard = () => {
     ))
 
     //patch to API
-    editTask(taskId, { status: newStatus }, accessToken)
+    editTask(taskId, { status: newStatus }, authFetch)
       .catch(() => {
         setTasks(prev => prev.map( t => t.id === taskId ? { ...t, status: task.status } : t ))
         setError('Failed to update task status')
@@ -384,9 +384,9 @@ export const KanbanBoard = () => {
       try {
         setLoading(true)
         const [projectData, objectivesData, tasksData] = await Promise.all([
-          getProject(projectId, accessToken),
-          getObjectives(projectId, accessToken),
-          getTasks({ project: projectId }, accessToken),
+          getProject(projectId, authFetch),
+          getObjectives(projectId, authFetch),
+          getTasks({ project: projectId }, authFetch),
         ])
         setProject(projectData)
         setObjectives(objectivesData)
@@ -397,8 +397,8 @@ export const KanbanBoard = () => {
         setLoading(false)
       }
     }
-    if (accessToken && projectId) load()
-  }, [projectId, accessToken])
+    if (authFetch && projectId) load()
+  }, [projectId, authFetch])
 
   useEffect(() => {
     async function loadTasks(){
@@ -408,7 +408,7 @@ export const KanbanBoard = () => {
         ? { objective: objectiveFilter }
         : { project : projectId }
 
-        const data = await getTasks(filters, accessToken)
+        const data = await getTasks(filters, authFetch)
         setTasks(data)
       }catch(err){
         setError(err.message)
@@ -416,8 +416,8 @@ export const KanbanBoard = () => {
         setTasksLoading(false)
       }
     }
-    if (accessToken && projectId) loadTasks()
-  }, [projectId, objectiveFilter, accessToken])
+    if (authFetch && projectId) loadTasks()
+  }, [projectId, objectiveFilter, authFetch])
  // Derive active objective name for breadcrumb
   const activeObjective = objectives.find((o) => String(o.id) === String(objectiveFilter))
   
@@ -534,7 +534,7 @@ export const KanbanBoard = () => {
           }
           tasks={tasks}
           navigate={navigate}
-          accessToken={accessToken}
+          authFetch={authFetch}
           objectiveFilter={objectiveFilter}
           onTaskCreated={(task) => setTasks((prev) => [...prev, task])}
           onTaskDeleted={(taskId) => setTasks((prev) => prev.filter((t) => t.id !== taskId))}

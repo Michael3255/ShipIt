@@ -12,7 +12,7 @@ const COLORS = {
   border: '#E4EAF2',
 }
 
-export function KanbanListView({ objectives, tasks, navigate, accessToken, onTaskCreated, onTaskDeleted, objectiveFilter }) {
+export function KanbanListView({ objectives, tasks, navigate, authFetch, onTaskCreated, onTaskDeleted, objectiveFilter }) {
   // If an objective filter is active, only show tasks for that objective
   const displayTasks = objectiveFilter
     ? tasks.filter((task) => String(task.objective) === String(objectiveFilter))
@@ -34,7 +34,7 @@ export function KanbanListView({ objectives, tasks, navigate, accessToken, onTas
             objective={objective}
             tasks={displayTasks.filter((t) => String(t.objective) === String(objective.id))}
             navigate={navigate}
-            accessToken={accessToken}
+            authFetch={authFetch}
             onTaskCreated={onTaskCreated}
             onTaskDeleted={onTaskDeleted}
           />
