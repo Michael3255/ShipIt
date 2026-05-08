@@ -377,8 +377,7 @@ export const ProjectsPage = () => {
                             '&:hover': { textDecoration: 'underline' },
                           }}
                           onClick={() => {
-                            setSelectedProject(project)
-                            setViewMode('board')
+                            navigate(`/projects/${project.id}/board`)
                           }}
                         >
                           {project.title}
@@ -420,8 +419,7 @@ export const ProjectsPage = () => {
                             <IconButton
                               size="small"
                               onClick={() => {
-                                setSelectedProject(project)
-                                setViewMode('board')
+                                navigate(`/projects/${project.id}/board`)
                               }}
                               sx={{ color: COLORS.teal, '&:hover': { bgcolor: COLORS.tealLight } }}
                             >

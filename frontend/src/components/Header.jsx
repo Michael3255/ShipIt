@@ -55,6 +55,7 @@ export default function Header() {
         {/* Nav */}
         <Box sx={{ display: "flex", gap: 0.5 }}>
           {[
+            { label: "Dashboard", to: "/dashboard" },
             { label: "Projects", to: "/projects" },
             { label: "Teams",    to: "/teams"    },
           ].map(({ label, to }) => (
