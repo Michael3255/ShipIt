@@ -54,3 +54,42 @@ export async function deleteTeam(teamId, authFetch) {
     throw new Error(data.detail || "Failed to delete team")
   }
 }
+
+export async function getTeam(teamId, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${teamId}/`)
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.detail || 'Failed to load team')
+  }
+
+  return data
+}
+
+export async function joinTeam(teamId, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${teamId}/join/`, {
+    method: 'POST',
+  })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.detail || 'Failed to join team')
+  }
+
+  return data
+}
+
+export async function leaveTeam(teamId, authFetch) {
+  const response = await authFetch(`${BASE_URL}/${teamId}/leave/`, {
+    method: 'POST',
+  })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.detail || 'Failed to leave team')
+  }
+
+  return data
+}
