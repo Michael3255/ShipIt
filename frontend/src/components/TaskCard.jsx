@@ -1,9 +1,11 @@
 
 // Renders a single task card used in the Kanban board columns
-// Clicking a card navigates to the task detail page
+// Clicking a card opens the TaskDrawer instead of navigating to a new page
 
 import React from 'react'
 import { Card, CardContent, Typography, Stack, Chip, Box } from '@mui/material'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 // ─── Design Tokens ────────────────────────────────────────────────
 const COLORS = {
@@ -13,11 +15,22 @@ const COLORS = {
   border:    '#E4EAF2',
 }
 
-export function TaskCard({ task, navigate }) {
+export function TaskCard({ task, onOpenDrawer }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  }
+
   return (
     <Card
-      // Navigate to task detail page on click
-      onClick={() => navigate(`/tasks/${task.id}`)}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      onClick={() => onOpenDrawer(task.id)}
       sx={{
         border: `1.5px solid ${COLORS.border}`,
         borderRadius: 2,
@@ -37,7 +50,7 @@ export function TaskCard({ task, navigate }) {
           {task.title}
         </Typography>
 
-        {/* Task description */}
+        {/* Task description — truncated to 2 lines */}
         {task.description && (
           <Typography sx={{
             fontSize: 11, color: 'text.secondary', mb: 1, lineHeight: 1.4,
@@ -47,7 +60,7 @@ export function TaskCard({ task, navigate }) {
           </Typography>
         )}
 
-        {/*  objective chip + assigned user avatar */}
+        {/* Bottom row — objective chip + assigned user avatar */}
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           {/* Objective label */}
           <Chip
@@ -59,13 +72,13 @@ export function TaskCard({ task, navigate }) {
             }}
           />
 
-          {/* Assigned user avatar shows first letter of username */}
+          {/* Assigned user avatar — shows first letter of username */}
           <Box sx={{
             width: 24, height: 24, borderRadius: '50%',
             bgcolor: COLORS.teal, display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <Typography sx={{ fontSize: 10, fontWeight: 700, color: '#fff' }}>
-              {task.assigned_user?.[0]?.toUpperCase() ?? '?'}
+              {task.assigned_username?.[0]?.toUpperCase() ?? '?'}
             </Typography>
           </Box>
         </Stack>

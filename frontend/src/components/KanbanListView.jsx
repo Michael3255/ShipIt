@@ -1,4 +1,3 @@
-
 // Renders the list view of the Kanban board
 // Groups tasks by objective — each objective is a collapsible section
 // Supports inline task creation and deletion per objective group
@@ -12,7 +11,7 @@ const COLORS = {
   border: '#E4EAF2',
 }
 
-export function KanbanListView({ objectives, tasks, navigate, authFetch, onTaskCreated, onTaskDeleted, objectiveFilter }) {
+export function KanbanListView({ objectives, tasks, authFetch, onTaskCreated, onTaskDeleted, objectiveFilter, onOpenDrawer }) {
   // If an objective filter is active, only show tasks for that objective
   const displayTasks = objectiveFilter
     ? tasks.filter((task) => String(task.objective) === String(objectiveFilter))
@@ -33,10 +32,10 @@ export function KanbanListView({ objectives, tasks, navigate, authFetch, onTaskC
             key={objective.id}
             objective={objective}
             tasks={displayTasks.filter((t) => String(t.objective) === String(objective.id))}
-            navigate={navigate}
             authFetch={authFetch}
             onTaskCreated={onTaskCreated}
             onTaskDeleted={onTaskDeleted}
+            onOpenDrawer={onOpenDrawer}
           />
         ))
       )}

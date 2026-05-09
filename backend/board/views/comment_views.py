@@ -9,6 +9,9 @@ class CommentListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
 
     def get_queryset(self):
+        task_id = self.request.query_params.get('task')
+        if task_id:
+            return Comment.objects.filter(task=task_id)
         return Comment.objects.filter(task__objective__project__team=self.request.user.team)
 
     def perform_create(self, serializer):

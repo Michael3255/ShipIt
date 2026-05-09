@@ -9,6 +9,8 @@ class TaskSummarySerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     objective_detail = ObjectiveSummarySerializer(source="objective", read_only=True)
+    # username of assigned user to display
+    assigned_username = serializers.StringRelatedField(source="assigned_user", read_only=True)
 
     class Meta:
         model = Task
@@ -19,6 +21,7 @@ class TaskSerializer(serializers.ModelSerializer):
             'status',
             'due_date',
             'assigned_user',
+            'assigned_username',
             'objective',
             'objective_detail',
             'created_at',

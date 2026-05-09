@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     // Drop-in replacement for fetch that handles token expiry automatically
-    // If a request returns a 401, it refreshes the token and retries
+    // If a request returns a 401, it refreshes the token and retries, on fail it redirects back to login
     const authFetch = async (url, options = {}) => {
         const token = localStorage.getItem("access")
         const res = await fetch(url, {

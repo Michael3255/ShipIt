@@ -1,7 +1,6 @@
-
 // Renders a collapsible group of tasks under a single objective
-// Used in the Kanban list view — one group per objective
 // Task creation and deletion
+// Edit icon and title click open the TaskDrawer instead of navigating
 
 import React, { useState } from 'react'
 import {
@@ -27,7 +26,7 @@ const COLORS = {
   surface:   '#F7F9FC',
 }
 
-export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTaskDeleted, authFetch }) {
+export function ObjectiveGroup({ objective, tasks, onTaskCreated, onTaskDeleted, authFetch, onOpenDrawer }) {
   // Controls whether the group is expanded or collapsed
   const [expanded, setExpanded] = useState(true)
   // Controls whether the inline add task form is visible
@@ -80,7 +79,7 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
             <Chip label={tasks.length} size="small" sx={{ bgcolor: COLORS.blueLight, color: COLORS.blue, fontWeight: 700, fontSize: 11, height: 20 }} />
           </Stack>
 
-          {/* Task Button */}
+          {/* Add Task button — stops click from toggling expand */}
           <Button
             size="small" startIcon={<AddIcon />}
             onClick={(e) => { e.stopPropagation(); setShowForm(!showForm); setExpanded(true) }}
@@ -130,7 +129,7 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
             </Box>
           )}
 
-          {/* ── Task Table and message for no tasks ── */}
+          {/* ── Task Table or Empty State ── */}
           {tasks.length === 0 && !showForm ? (
             <Box sx={{ py: 3, textAlign: 'center' }}>
               <Typography sx={{ fontSize: 13, color: 'text.disabled' }}>No tasks yet</Typography>
@@ -150,16 +149,16 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
                 <TableBody>
                   {tasks.map((task) => (
                     <TableRow key={task.id} sx={{ '&:hover': { bgcolor: COLORS.blueLight } }}>
-                      {/* Title — click to go to task detail */}
+                      {/* Title — click to open TaskDrawer */}
                       <TableCell
                         sx={{ fontWeight: 600, color: COLORS.blue, cursor: 'pointer' }}
-                        onClick={() => navigate(`/tasks/${task.id}`)}
+                        onClick={() => onOpenDrawer(task.id)}
                       >
                         {task.title}
                       </TableCell>
                       <TableCell sx={{ fontSize: 13, color: 'text.secondary' }}>{task.description || '-'}</TableCell>
 
-                      {/* Status */}
+                      {/* Status chip */}
                       <TableCell>
                         <Chip
                           label={task.status}
@@ -173,14 +172,15 @@ export function ObjectiveGroup({ objective, tasks, navigate, onTaskCreated, onTa
                       </TableCell>
                       <TableCell sx={{ fontSize: 13 }}>{task.due_date || '-'}</TableCell>
 
-                      {/* Edit and Delete with confirmation */}
+                      {/* Actions — edit opens TaskDrawer, delete shows confirmation */}
                       <TableCell>
                         <Stack direction="row" alignItems="center" spacing={0.5}>
-                          <IconButton size="small" onClick={() => navigate(`/tasks/${task.id}`)} sx={{ color: COLORS.blue }}>
+                          {/* Edit icon — opens TaskDrawer instead of navigating */}
+                          <IconButton size="small" onClick={() => onOpenDrawer(task.id)} sx={{ color: COLORS.blue }}>
                             <ModeEditIcon fontSize="small" />
                           </IconButton>
 
-                          {/*  delete confirmation */}
+                          {/* Inline delete confirmation */}
                           {confirmDeleteId === task.id ? (
                             <Stack direction="row" alignItems="center" spacing={0.5}>
                               <Typography variant="caption">Delete?</Typography>

@@ -5,13 +5,13 @@ import { getProject } from '../api/projects'
 import { getObjectives } from '../api/objectives'
 import { getTasks, createTask, editTask } from '../api/tasks'
 import { KanbanListView } from './KanbanListView'
+import { TaskDrawer } from './TaskDrawer'
+import { TaskCard } from './TaskCard'
 
 import { FormGroup, TextField, FormControl } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import { DndContext, PointerSensor, useSensor, useSensors, DragOverlay, useDroppable } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy, useSortable, } from '@dnd-kit/sortable'
-
-import { CSS } from '@dnd-kit/utilities'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 
 import PageContainer from './PageContainer'
 import {
@@ -21,10 +21,10 @@ import {
   MenuItem
 } from '@mui/material'
 import FilterListIcon from '@mui/icons-material/FilterList'
-import CloseIcon from '@mui/icons-material/Close'
 import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
 import ViewListIcon from '@mui/icons-material/ViewList'
 
+// ─── Design Tokens ────────────────────────────────────────────────
 const COLORS = {
   blue:      '#1B6FEB',
   blueDark:  '#1358C4',
@@ -46,6 +46,7 @@ const COLUMNS = [
   { id: 'In Progress', label: 'In Progress' },
   { id: 'Done',        label: 'Done'        },
 ]
+
 const inputSx = {
   bgcolor: "#fff",
   borderRadius: 2,
@@ -57,68 +58,8 @@ const inputSx = {
   "& .MuiInputLabel-root.Mui-focused": { color: COLORS.blue },
 }
 
-// ─── Task Card ────────────────────────────────────────────────────
-
-
-function TaskCard({ task }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4:1,
-  }
-
-  return (
-    <Card ref={setNodeRef} style={style} {...attributes} {...listeners} sx={{
-      border: `1.5px solid ${COLORS.border}`,
-      borderRadius: 2,
-      boxShadow: 'none',
-      cursor: 'pointer',
-      transition: 'all 0.15s ease',
-      '&:hover': {
-        borderColor: COLORS.blue,
-        transform: 'translateY(-1px)',
-        boxShadow: `0 4px 12px rgba(27,111,235,0.10)`,
-      },
-    }}>
-      <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-        <Typography sx={{ fontWeight: 600, fontSize: 13, color: 'text.primary', mb: 0.5, lineHeight: 1.3 }}>
-          {task.title}
-        </Typography>
-        {task.description && (
-          <Typography sx={{ fontSize: 11, color: 'text.secondary', mb: 1, lineHeight: 1.4,
-            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
-          }}>
-            {task.description}
-          </Typography>
-        )}
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Chip
-            label={task.objective_detail?.title ?? ''}
-            size="small"
-            sx={{ fontSize: 10, height: 18, bgcolor: COLORS.blueLight, color: COLORS.blue, fontWeight: 600,
-              maxWidth: 140, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
-            }}
-          />
-          <Box sx={{
-            width: 24, height: 24, borderRadius: '50%',
-            bgcolor: COLORS.teal, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Typography sx={{ fontSize: 10, fontWeight: 700, color: '#fff' }}>
-              {task.assigned_user?.[0]?.toUpperCase() ?? '?'}
-            </Typography>
-          </Box>
-        </Stack>
-      </CardContent>
-    </Card>
-  )
-}
-
-// ---- Show Task Form
-/* eslint-disable no-unused-vars */
-function TaskForm({ column, objectives, objectiveFilter,formData,handleChange,handleSubmit, onCancel 
-}){
+// ─── Task Form (inline add task in board columns) ─────────────────
+function TaskForm({ column, objectives, objectiveFilter, formData, handleChange, handleSubmit, onCancel }) {
   const isValid = formData.title !== "" && formData.due_date !== ""
 
   return (
@@ -127,7 +68,7 @@ function TaskForm({ column, objectives, objectiveFilter,formData,handleChange,ha
       onSubmit={handleSubmit}
       autoComplete='off'
       sx={{
-        mb:3,
+        mb: 3,
         p: 3,
         borderRadius: 3,
         border: `1.5px dashed ${COLORS.blue}`,
@@ -161,9 +102,9 @@ function TaskForm({ column, objectives, objectiveFilter,formData,handleChange,ha
               sx={inputSx}
             />
           </Grid>
-          {/* Add Drop down for objective */}
+          {/* Objective dropdown */}
           <Grid>
-            <Select name="objective" value={formData.objective}onChange={handleChange}>
+            <Select name="objective" value={formData.objective} onChange={handleChange}>
               {objectives.map((obj) => (
                 <MenuItem key={obj.id} value={obj.id}>{obj.title}</MenuItem>
               ))}
@@ -230,30 +171,30 @@ function TaskForm({ column, objectives, objectiveFilter,formData,handleChange,ha
           </Button>
         </Stack>
       </FormGroup>
-
     </Box>
   )
 }
 
 // ─── Column ───────────────────────────────────────────────────────
-function Column({ column, tasks, activeColumn, setActiveColumn, objectives, objectiveFilter, formData, handleChange, handleSubmit }) {
-  const { setNodeRef , isOver } = useDroppable({ id: column.id })
+// Renders a single status column with task cards and inline add form
+function Column({ column, tasks, onOpenDrawer, activeColumn, setActiveColumn, objectives, objectiveFilter, formData, handleChange, handleSubmit }) {
+  const { setNodeRef, isOver } = useDroppable({ id: column.id })
   const meta = COLUMN_META[column.id] || COLUMN_META['To Do']
 
   return (
     <Box
-      ref={setNodeRef} 
+      ref={setNodeRef}
       sx={{
         width: 280, minWidth: 280, flexShrink: 0,
         display: 'flex', flexDirection: 'column',
-        bgcolor: isOver ? meta.accent + '22' : meta.bg,  // ← subtle highlight
+        bgcolor: isOver ? meta.accent + '22' : meta.bg,
         border: `1.5px solid ${isOver ? meta.accent : COLORS.border}`,
         borderTop: `3px solid ${meta.accent}`,
         borderRadius: 2,
         p: 1.5,
         gap: 1,
-        transition: 'all 0.15s ease',  // ← smooth transition
-        minHeight: isOver ? 200 : 'auto',  // ← expands when dragging over
+        transition: 'all 0.15s ease',
+        minHeight: isOver ? 200 : 'auto',
       }}>
       {/* Column header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={0.5}>
@@ -266,73 +207,81 @@ function Column({ column, tasks, activeColumn, setActiveColumn, objectives, obje
           sx={{ bgcolor: meta.chipBg, color: meta.chipColor, fontWeight: 700, fontSize: 11, height: 20 }}
         />
       </Stack>
-      {/* Task cards */}
-       <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minHeight: 120, flex:1 }}>
-            {tasks.length === 0 ? (
-              <Box sx={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                py: 3, borderRadius: 1.5,
-                border: `1.5px dashed ${COLORS.border}`,
-              }}>
-                <Typography sx={{ fontSize: 12, color: 'text.disabled' }}>No tasks</Typography>
-              </Box>
-            ) : (
-              tasks.map((task) => <TaskCard key={task.id} task={task} />)
-            )}
+
+      {/* Task cards — clicking opens TaskDrawer */}
+      <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minHeight: 120, flex: 1 }}>
+          {tasks.length === 0 ? (
+            <Box sx={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              py: 3, borderRadius: 1.5,
+              border: `1.5px dashed ${COLORS.border}`,
+            }}>
+              <Typography sx={{ fontSize: 12, color: 'text.disabled' }}>No tasks</Typography>
             </Box>
-          </SortableContext>
-            {activeColumn === column.id ? (
-              <TaskForm
-                column={column}
-                objectives={objectives}
-                objectiveFilter={objectiveFilter}
-                formData={formData}
-                handleChange={handleChange}
-                handleSubmit={handleSubmit}
-                onCancel={() => setActiveColumn(null)}
-              />
-            ): (
-            <Button
-              onClick={() => setActiveColumn(column.id)}
-              sx={{ mt: 1, color: COLORS.blue, textTransform: 'none', fontWeight: 600 }}
-            >
-              + Add Task
-            </Button>
+          ) : (
+            tasks.map((task) => (
+              <TaskCard key={task.id} task={task} onOpenDrawer={onOpenDrawer} />
+            ))
           )}
+        </Box>
+      </SortableContext>
+
+      {/* Inline add task form or add button */}
+      {activeColumn === column.id ? (
+        <TaskForm
+          column={column}
+          objectives={objectives}
+          objectiveFilter={objectiveFilter}
+          formData={formData}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          onCancel={() => setActiveColumn(null)}
+        />
+      ) : (
+        <Button
+          onClick={() => setActiveColumn(column.id)}
+          sx={{ mt: 1, color: COLORS.blue, textTransform: 'none', fontWeight: 600 }}
+        >
+          + Add Task
+        </Button>
+      )}
     </Box>
   )
 }
+
 // ─── Main Component ───────────────────────────────────────────────
 export const KanbanBoard = () => {
-  const { projectId }          = useParams()
-  const [searchParams]         = useSearchParams()
-  const navigate               = useNavigate()
-  const { authFetch }        = useContext(AuthContext)
-  const objectiveFilter        = searchParams.get('objective')
-  const sensors                = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 }}))
+  const { projectId }     = useParams()
+  const [searchParams]    = useSearchParams()
+  const navigate          = useNavigate()
+  const { authFetch }     = useContext(AuthContext)
+  const objectiveFilter   = searchParams.get('objective')
+  const sensors           = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
-  const [tasks, setTasks]               = useState([])
-  const [tasksLoading, setTasksLoading] = useState(true)
-  const [activeTask, setActiveTask]     = useState(null)
-  const [project, setProject]           = useState(null)
-  const [viewMode, setViewMode]         = useState('board')
-  const [objectives, setObjectives]        = useState([])
-  const [activeColumn, setActiveColumn]      = useState(null)
-  const [formData, setFormData] = useState({ title: "", description: "", status: "To Do", due_date: "", objective: objectiveFilter ?? "" })
+  const [tasks, setTasks]                   = useState([])
+  const [tasksLoading, setTasksLoading]     = useState(true)
+  const [activeTask, setActiveTask]         = useState(null)
+  const [project, setProject]               = useState(null)
+  const [viewMode, setViewMode]             = useState('board')
+  const [objectives, setObjectives]         = useState([])
+  const [activeColumn, setActiveColumn]     = useState(null)
+  const [formData, setFormData]             = useState({ title: "", description: "", status: "To Do", due_date: "", objective: objectiveFilter ?? "" })
+  const [loading, setLoading]               = useState(true)
+  const [error, setError]                   = useState('')
 
-  const [loading, setLoading]           = useState(true)
-  const [error, setError]               = useState('')
+  // ── Drawer state ──
+  const [drawerTaskId, setDrawerTaskId]     = useState(null)
+  const [drawerOpen, setDrawerOpen]         = useState(false)
 
- function handleChange(event){
+  function handleChange(event) {
     const { name, value } = event.target
-    setFormData((prev) => ({ ...prev, [name]: value
-    }))
- } 
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
-  async function handleSubmit(event){
+  async function handleSubmit(event) {
     event.preventDefault()
-    try{
+    try {
       const payload = {
         ...formData,
         status: activeColumn,
@@ -341,44 +290,53 @@ export const KanbanBoard = () => {
       const savedTasks = await createTask(payload.objective, payload, authFetch)
       setTasks((prev) => [...prev, savedTasks])
       setActiveColumn(null)
-      setFormData({ title: "", description: "", status: "To Do", due_date: "", objective: objectiveFilter ?? ""})
-    } catch(err){
-        setError(err.message)
+      setFormData({ title: "", description: "", status: "To Do", due_date: "", objective: objectiveFilter ?? "" })
+    } catch (err) {
+      setError(err.message)
     }
   }
 
-  function handleDragEnd(event){
+  function handleDragEnd(event) {
     setActiveTask(null)
     const { active, over } = event
-    if (!over) return // dropped outside returns back to original position
+    if (!over) return
 
     const taskId = active.id
-
     const overIsColumn = COLUMNS.some(col => col.id === over.id)
-
     const newStatus = overIsColumn
       ? over.id
       : tasks.find(t => t.id === over.id)?.status
 
-    if(!newStatus) return
+    if (!newStatus) return
 
     const task = tasks.find(t => t.id === taskId)
-    if(!task || task.status === newStatus) return
+    if (!task || task.status === newStatus) return
 
-    //updates
+    // update locally
     setTasks(prev => prev.map(t =>
       t.id === taskId ? { ...t, status: newStatus } : t
     ))
 
-    //patch to API
+    // patch to API — revert on failure
     editTask(taskId, { status: newStatus }, authFetch)
       .catch(() => {
-        setTasks(prev => prev.map( t => t.id === taskId ? { ...t, status: task.status } : t ))
+        setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: task.status } : t))
         setError('Failed to update task status')
       })
   }
 
-  // Fetch project title and objectives for breadcrumb + filter label
+  // ── Opens the drawer with the selected task ──
+  function handleOpenDrawer(taskId) {
+    setDrawerTaskId(taskId)
+    setDrawerOpen(true)
+  }
+
+  // ── Updates task in real time when saved from drawer ──
+  function handleTaskUpdated(updatedTask) {
+    setTasks((prev) => prev.map((t) => t.id === updatedTask.id ? updatedTask : t))
+  }
+
+  // ── Fetch project, objectives and all tasks on mount ──
   useEffect(() => {
     async function load() {
       try {
@@ -400,45 +358,44 @@ export const KanbanBoard = () => {
     if (authFetch && projectId) load()
   }, [projectId, authFetch])
 
+  // ── Reload tasks when objective filter changes ──
   useEffect(() => {
-    async function loadTasks(){
-      try{
+    async function loadTasks() {
+      try {
         setTasksLoading(true)
         const filters = objectiveFilter
-        ? { objective: objectiveFilter }
-        : { project : projectId }
-
+          ? { objective: objectiveFilter }
+          : { project: projectId }
         const data = await getTasks(filters, authFetch)
         setTasks(data)
-      }catch(err){
+      } catch (err) {
         setError(err.message)
-      }finally {
+      } finally {
         setTasksLoading(false)
       }
     }
     if (authFetch && projectId) loadTasks()
   }, [projectId, objectiveFilter, authFetch])
- // Derive active objective name for breadcrumb
+
+  // Derive active objective name for breadcrumb
   const activeObjective = objectives.find((o) => String(o.id) === String(objectiveFilter))
-  
 
-
-  // Filter tasks
   const displayTasks = tasks
-
   const STATUS = Object.groupBy(displayTasks, ({ status }) => status)
-// Breadcrumbs
+
+  // Breadcrumbs
   const breadcrumbs = [
     { title: 'Projects', path: '/projects' },
     { title: project?.title ?? 'Project', path: `/projects/${projectId}` },
     { title: activeObjective ? `Board · ${activeObjective.title}` : 'Board' },
   ]
 
-  if (loading || tasksLoading ) return (
+  // ── Loading skeleton ──
+  if (loading || tasksLoading) return (
     <PageContainer title="Board" breadcrumbs={breadcrumbs}>
       <Stack direction="row" gap={2} sx={{ overflowX: 'auto', pb: 2 }}>
         {COLUMNS.map((col) => (
-          <Box key={col.id} sx={{ width: 280, minWidth: 280, flexShrink: 0, minHeight: '500px'}}>
+          <Box key={col.id} sx={{ width: 280, minWidth: 280, flexShrink: 0, minHeight: '500px' }}>
             <Skeleton variant="rounded" height={32} sx={{ mb: 1, borderRadius: 2 }} />
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} variant="rounded" height={80} sx={{ mb: 1, borderRadius: 2 }} />
@@ -456,8 +413,9 @@ export const KanbanBoard = () => {
     >
       {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
 
-      {/* View toggle + filter banner */}
+      {/* ── View toggle + objective filter ── */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+
         {/* Objective filter dropdown — always visible */}
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <FilterListIcon sx={{ fontSize: 16, color: COLORS.blue }} />
@@ -525,58 +483,71 @@ export const KanbanBoard = () => {
         </Stack>
       </Stack>
 
-      {/* List View */}
+      {/* ── List View — tasks grouped by objective ── */}
       {viewMode === 'list' && (
         <KanbanListView
-          objectives={objectiveFilter 
+          objectives={objectiveFilter
             ? objectives.filter((o) => String(o.id) === String(objectiveFilter))
             : objectives
           }
           tasks={tasks}
-          navigate={navigate}
           authFetch={authFetch}
           objectiveFilter={objectiveFilter}
+          onOpenDrawer={handleOpenDrawer}
           onTaskCreated={(task) => setTasks((prev) => [...prev, task])}
           onTaskDeleted={(taskId) => setTasks((prev) => prev.filter((t) => t.id !== taskId))}
         />
       )}
-      
-        {/* Board */}
-        {viewMode === 'board' && (
-          <DndContext sensors={sensors} 
-            onDragStart={(event) => {
-              const task = tasks.find(t => t.id === event.active.id)
-              setActiveTask(task)
-            }} 
-            onDragEnd={handleDragEnd}>
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                gap: 2,
-                overflowX: 'auto',
-                pb: 2,
-                alignItems: 'flex-start',
-              }}>
-              {COLUMNS.map((column) => (
-                <Column
-                  key={column.id}
-                  column={column}
-                  tasks={STATUS[column.id] ?? []}
-                  activeColumn={activeColumn}
-                  setActiveColumn={setActiveColumn}
-                  objectives={objectives}
-                  objectiveFilter={objectiveFilter}
-                  formData={formData}
-                  handleChange={handleChange}
-                  handleSubmit={handleSubmit}
-                />
-              ))}
-            </Box>
-            <DragOverlay>
-              {activeTask ? <TaskCard task={activeTask} />: null}
-            </DragOverlay>
-          </DndContext>
-        )}      
+
+      {/* ── Board View — tasks in status columns with drag and drop ── */}
+      {viewMode === 'board' && (
+        <DndContext
+          sensors={sensors}
+          onDragStart={(event) => {
+            const task = tasks.find(t => t.id === event.active.id)
+            setActiveTask(task)
+          }}
+          onDragEnd={handleDragEnd}
+        >
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 2,
+            overflowX: 'auto',
+            pb: 2,
+            alignItems: 'flex-start',
+          }}>
+            {COLUMNS.map((column) => (
+              <Column
+                key={column.id}
+                column={column}
+                tasks={STATUS[column.id] ?? []}
+                onOpenDrawer={handleOpenDrawer}
+                activeColumn={activeColumn}
+                setActiveColumn={setActiveColumn}
+                objectives={objectives}
+                objectiveFilter={objectiveFilter}
+                formData={formData}
+                handleChange={handleChange}
+                handleSubmit={handleSubmit}
+              />
+            ))}
+          </Box>
+
+          {/* Drag overlay — shows card while dragging */}
+          <DragOverlay>
+            {activeTask ? <TaskCard task={activeTask} onOpenDrawer={handleOpenDrawer} /> : null}
+          </DragOverlay>
+        </DndContext>
+      )}
+
+      {/* ── Task Drawer — slides out from right when task is clicked ── */}
+      <TaskDrawer
+        taskId={drawerTaskId}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onTaskUpdated={handleTaskUpdated}
+      />
     </PageContainer>
   )
 }

@@ -4,6 +4,10 @@ from .task_serializer import TaskSummarySerializer
 
 class CommentSerializer(serializers.ModelSerializer):
     task_detail = TaskSummarySerializer(source="task", read_only=True)
+    # username for display in drawer
+    username = serializers.StringRelatedField(source="user", read_only=True)
+    # user_id for ownership check in drawer
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
 
     class Meta:
         model = Comment
@@ -13,6 +17,8 @@ class CommentSerializer(serializers.ModelSerializer):
             'task',
             'task_detail',
             'user',
+            'user_id',
+            'username',
             'created_at',
         ]
         read_only_fields = ['id','created_at', 'user']
