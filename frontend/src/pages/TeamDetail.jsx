@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import AuthContext from '../context/AuthContext'
+import { getTeam, joinTeam, leaveTeam } from '../api/teams'
 
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
@@ -27,17 +28,7 @@ export const TeamDetail = () => {
         setLoading(true)
         setError('')
 
-        const response = await fetch(`http://127.0.0.1:8000/api/teams/${teamId}/`, {
-          headers: {
-            Authorization: `Bearer ${authFetch}`,
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to load team')
-        }
-
-        const data = await response.json()
+        const data = await getTeam(teamId, authFetch)
         setTeam(data)
       } catch (err) {
         setError(err.message)
@@ -56,27 +47,10 @@ export const TeamDetail = () => {
       setError('')
       setSuccessMessage('')
 
-      const response = await fetch(`http://127.0.0.1:8000/api/teams/${teamId}/join/`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${authFetch}`,
-        },
-      })
+      await joinTeam(teamId, authFetch)
 
-      if (!response.ok) {
-        throw new Error('Failed to join team')
-      }
-
-      const updatedTeamResponse = await fetch(`http://127.0.0.1:8000/api/teams/${teamId}/`, {
-        headers: {
-          Authorization: `Bearer ${authFetch}`,
-        },
-      })
-
-      if (updatedTeamResponse.ok) {
-        const updatedTeam = await updatedTeamResponse.json()
-        setTeam(updatedTeam)
-      }
+      const updatedTeam = await getTeam(teamId, authFetch)
+      setTeam(updatedTeam)
 
       setSuccessMessage('You joined this team successfully.')
     } catch (err) {
@@ -86,34 +60,17 @@ export const TeamDetail = () => {
 
   async function handleLeaveTeam() {
     try {
-        setError('')
-        setSuccessMessage('')
+      setError('')
+      setSuccessMessage('')
 
-        const response = await fetch(`http://127.0.0.1:8000/api/teams/${teamId}/leave/`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${authFetch}`,
-        },
-        })
+      await leaveTeam(teamId, authFetch)
 
-        if (!response.ok) {
-        throw new Error('Failed to leave team')
-        }
+      const updatedTeam = await getTeam(teamId, authFetch)
+      setTeam(updatedTeam)
 
-        const updatedTeamResponse = await fetch(`http://127.0.0.1:8000/api/teams/${teamId}/`, {
-        headers: {
-            Authorization: `Bearer ${authFetch}`,
-        },
-        })
-
-        if (updatedTeamResponse.ok) {
-        const updatedTeam = await updatedTeamResponse.json()
-        setTeam(updatedTeam)
-        }
-
-        setSuccessMessage('You left this team successfully.')
+      setSuccessMessage('You left this team successfully.')
     } catch (err) {
-        setError(err.message)
+      setError(err.message)
     }
   }
 
