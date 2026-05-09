@@ -2,6 +2,7 @@ from django.urls import path
 from .views.project_views import ProjectListCreateView, ProjectDetailView
 from .views.objective_views import ObjectiveListCreateView, ObjectiveDetailView
 from .views.task_views import TaskListCreateView, TaskDetailView
+from .views.comment_views import CommentListCreateView, CommentDetailView
 
 urlpatterns = [
     # ---------------- PROJECTS ----------------
@@ -16,4 +17,7 @@ urlpatterns = [
     path('tasks/', TaskListCreateView.as_view(), name='create_task'),
     path('tasks/<int:pk>/', TaskDetailView.as_view(), name='task_detail'),
 
+    # ---------------- COMMENTS ----------------
+    path('comments/', CommentListCreateView.as_view(), name='comment-list-create'),
+    path('comments/<int:pk>/', CommentDetailView.as_view(), name='comment-detail'),
 ]

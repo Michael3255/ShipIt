@@ -5,8 +5,6 @@ import Register from "../pages/Register";
 import { ProjectsPage } from '../pages/ProjectsPage'
 import { ProjectDetails } from "../pages/ProjectDetail";
 import { ObjectiveDetail } from '../pages/ObjectiveDetail'
-import { TasksPage } from '../pages/TasksPage'
-import { TaskDetail } from '../pages/TaskDetail'
 import { TeamsPage } from "../pages/TeamsPage";
 import { KanbanBoard } from "../components/KanbanBoard";
 import Dashboard from "../pages/Dashboard";
@@ -49,14 +47,9 @@ function AppRoutes() {
                 {/* Objective detail */}
                 <Route path="/objectives/:objectiveId" element={<ObjectiveDetail />} />
 
-                {/* Objective → tasks */}
-                <Route path="/objectives/:objectiveId/tasks" element={<TasksPage />} />
-
                 {/* ProjectId -> board */}
                 <Route path="/projects/:projectId/board" element={ <KanbanBoard /> } />
 
-                {/* Task Detail */}
-                <Route path="/tasks/:taskId" element={<TaskDetail />} />
             </Route>
         </Routes>
         </AuthProvider>

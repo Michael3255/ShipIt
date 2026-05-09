@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useContext, useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import AuthContext from '../context/AuthContext'
 import { getObjectives, createObjective, editObjective, deleteObjective } from '../api/objectives'
 
@@ -31,8 +31,7 @@ import PageContainer from '../components/PageContainer'
 export const ObjectiveDetail = () => {
   const { authFetch } = useContext(AuthContext)
   const { id } = useParams()
-  const navigate = useNavigate()
-
+  // removed navigate, add it back if you run into problems
   const [viewMode, setViewMode] = useState('list')
   const [objectives, setObjectives] = useState([])
   const [selectedObjective, setSelectedObjective] = useState(null)
@@ -260,12 +259,6 @@ export const ObjectiveDetail = () => {
                             <DeleteIcon />
                           </IconButton>
                         )}
-                        <Button
-                          size="small" variant="outlined"
-                          onClick={() => navigate(`/objectives/${objective.id}/tasks`)}
-                        >
-                          View Tasks
-                        </Button>
                       </TableCell>
                     </TableRow>
                   ))

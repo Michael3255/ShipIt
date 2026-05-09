@@ -148,6 +148,7 @@ REST_FRAMEWORK={
 
 from datetime import timedelta
 
+# access token expires every 5min but authFetch creates a new if a user has a refresh token.
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
