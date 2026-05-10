@@ -2,16 +2,20 @@ from rest_framework import serializers
 from ..models import Project
 
 class ProjectSummarySerializer(serializers.ModelSerializer):
+    team = serializers.StringRelatedField(read_only=True)
+
     class Meta:
-        model=Project
-        fields=["id",
-        "title",
-        "team"
+        model = Project
+        fields = [
+            "id",
+            "title",
+            "team"
         ]
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
-    team = serializers.PrimaryKeyRelatedField(read_only=True)
+    team = serializers.StringRelatedField(read_only=True)
     objectives_count = serializers.SerializerMethodField()
 
     class Meta:
