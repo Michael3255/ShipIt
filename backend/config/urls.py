@@ -26,10 +26,11 @@ urlpatterns = [
     path('api/', include('teams.urls')),
     path('api/', include('users.urls')),
     
+    # AI Tools endpoints
+    path('api/ai/', include ('ai_tools.urls')),
 
     # JWT auth endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
 ]

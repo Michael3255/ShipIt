@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     'teams',
     'users',
     'board',
+    
+    #Custom API
+    'ai_tools',
 ]
 
 MIDDLEWARE = [
