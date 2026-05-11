@@ -7,6 +7,7 @@ import { ProjectDetails } from "../pages/ProjectDetail";
 import { ObjectiveDetail } from '../pages/ObjectiveDetail'
 import { TeamsPage } from "../pages/TeamsPage";
 import { KanbanBoard } from "../components/KanbanBoard";
+import { StoryBuilder } from "../pages/StoryBuilder";
 import Dashboard from "../pages/Dashboard";
 import Layout from "../components/Layout"
 import { TeamDetail } from "../pages/TeamDetail";
@@ -29,6 +30,10 @@ function AppRoutes() {
                     <Layout />
                 </ProtectedRoute>
             }>
+                {/* API - AI Tools */}
+                {/* AI Story Builder */}
+                <Route path="/story-builder" element={<StoryBuilder />} />
+
                 {/* Dashboard */}
                 <Route path="/dashboard" element={<Dashboard />} />
                 

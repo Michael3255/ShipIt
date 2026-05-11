@@ -1,22 +1,61 @@
+/* ─── ShipIt Design System ─────────────────────────────────────── */
+/* Matches the blue/teal theme used across all components           */
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* ── Brand Colors ── */
+  --blue:         #1B6FEB;
+  --blue-dark:    #1358C4;
+  --blue-light:   #EBF2FF;
+  --blue-mid:     #C7DCFF;
+  --teal:         #0ABFA3;
+  --teal-dark:    #088F79;
+  --teal-light:   #E0FAF6;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* ── Neutral Surface ── */
+  --bg:           #F7F9FC;
+  --surface:      #FFFFFF;
+  --border:       #E4EAF2;
+  --border-focus: var(--blue);
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
+  /* ── Text ── */
+  --text:         #0D1B2A;
+  --text-muted:   #5C6E82;
+  --text-light:   #98A8B8;
+  --text-inverse: #FFFFFF;
+
+  /* ── Semantic ── */
+  --accent:       var(--blue);
+  --accent-bg:    var(--blue-light);
+  --accent-border:var(--blue-mid);
+  --success:      var(--teal);
+  --success-bg:   var(--teal-light);
+  --error:        #DC2626;
+  --error-bg:     #FEF2F2;
+
+  /* ── Shadows ── */
+  --shadow-sm:    0 1px 3px rgba(13, 27, 42, 0.08), 0 1px 2px rgba(13, 27, 42, 0.04);
+  --shadow-md:    0 4px 12px rgba(27, 111, 235, 0.10), 0 2px 4px rgba(13, 27, 42, 0.06);
+  --shadow-lg:    0 8px 24px rgba(27, 111, 235, 0.14), 0 4px 8px rgba(13, 27, 42, 0.08);
+
+  /* ── Typography ── */
+  --sans:         system-ui, 'Segoe UI', Roboto, -apple-system, sans-serif;
+  --mono:         ui-monospace, 'Fira Code', Consolas, monospace;
+
+  /* ── Spacing & Shape ── */
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    14px;
+  --radius-xl:    20px;
+
+  /* ── Transitions ── */
+  --transition:   all 0.15s ease;
+  --transition-md:all 0.25s ease;
+
+  /* ── Base ── */
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
   color-scheme: light dark;
   color: var(--text);
   background: var(--bg);
@@ -24,81 +63,268 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+/* ─── Dark Mode ─────────────────────────────────────────────────── */
+/* Keeps light background — only adjusts subtle tones */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:           #F7F9FC;
+    --surface:      #FFFFFF;
+    --border:       #E4EAF2;
+    --border-focus: var(--blue);
+
+    --text:         #0D1B2A;
+    --text-muted:   #5C6E82;
+    --text-light:   #98A8B8;
+
+    --blue-light:   #EBF2FF;
+    --blue-mid:     #C7DCFF;
+    --teal-light:   #E0FAF6;
+
+    --accent-bg:    #EBF2FF;
+    --accent-border:#C7DCFF;
+
+    --shadow-sm:    0 1px 3px rgba(13, 27, 42, 0.08), 0 1px 2px rgba(13, 27, 42, 0.04);
+    --shadow-md:    0 4px 12px rgba(27, 111, 235, 0.10), 0 2px 4px rgba(13, 27, 42, 0.06);
+    --shadow-lg:    0 8px 24px rgba(27, 111, 235, 0.14), 0 4px 8px rgba(13, 27, 42, 0.08);
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+/* ─── Reset & Base ──────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
 }
 
 #root {
   min-height: 100vh;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+/* ─── Typography ────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--sans);
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
+h1 { font-size: 2.25rem;  font-weight: 800; }
+h2 { font-size: 1.75rem;  font-weight: 700; }
+h3 { font-size: 1.375rem; font-weight: 700; }
+h4 { font-size: 1.125rem; font-weight: 600; }
+h5 { font-size: 1rem;     font-weight: 600; }
+h6 { font-size: 0.875rem; font-weight: 600; }
+
 p {
   margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
 }
 
+a {
+  color: var(--blue);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:hover {
+  color: var(--blue-dark);
+  text-decoration: underline;
+}
+
+/* ─── Code ──────────────────────────────────────────────────────── */
 code,
-.counter {
+pre {
   font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  border-radius: var(--radius-sm);
 }
 
 code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+  font-size: 0.875rem;
+  padding: 2px 6px;
+  background: var(--blue-light);
+  color: var(--blue-dark);
+  border: 1px solid var(--accent-border);
+}
+
+pre {
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+pre code {
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+  transition: var(--transition);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
+}
+
+/* ─── Focus ─────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Selection ─────────────────────────────────────────────────── */
+::selection {
+  background: var(--blue-light);
+  color: var(--blue-dark);
+}
+
+/* ─── Utility Classes ───────────────────────────────────────────── */
+
+/* Text */
+.text-primary   { color: var(--text); }
+.text-muted     { color: var(--text-muted); }
+.text-light     { color: var(--text-light); }
+.text-blue      { color: var(--blue); }
+.text-teal      { color: var(--teal); }
+
+/* Backgrounds */
+.bg-surface     { background: var(--surface); }
+.bg-blue-light  { background: var(--blue-light); }
+.bg-teal-light  { background: var(--teal-light); }
+
+/* Borders */
+.border         { border: 1.5px solid var(--border); }
+.border-blue    { border: 1.5px solid var(--blue); }
+.border-teal    { border: 1.5px solid var(--teal); }
+
+/* Radius */
+.rounded-sm     { border-radius: var(--radius-sm); }
+.rounded        { border-radius: var(--radius-md); }
+.rounded-lg     { border-radius: var(--radius-lg); }
+.rounded-xl     { border-radius: var(--radius-xl); }
+.rounded-full   { border-radius: 9999px; }
+
+/* Shadows */
+.shadow-sm      { box-shadow: var(--shadow-sm); }
+.shadow-md      { box-shadow: var(--shadow-md); }
+.shadow-lg      { box-shadow: var(--shadow-lg); }
+
+/* Transitions */
+.transition     { transition: var(--transition); }
+.transition-md  { transition: var(--transition-md); }
+
+/* ─── MUI Theme Override Helpers ────────────────────────────────── */
+/* Ensures MUI components inherit the correct background in dark mode */
+.MuiPaper-root {
+  background-color: var(--surface) !important;
+}
+
+.MuiTableCell-root {
+  border-color: var(--border) !important;
+}
+
+/* ─── Kanban Board Specific ─────────────────────────────────────── */
+.kanban-board {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  align-items: flex-start;
+  min-height: 60vh;
+}
+
+.kanban-column {
+  width: 280px;
+  min-width: 280px;
+  flex-shrink: 0;
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  transition: var(--transition);
+}
+
+.kanban-column.is-over {
+  border-color: var(--blue) !important;
+  box-shadow: var(--shadow-md);
+}
+
+.kanban-card {
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  transition: var(--transition);
+  cursor: grab;
+}
+
+.kanban-card:active {
+  cursor: grabbing;
+}
+
+.kanban-card:hover {
+  border-color: var(--blue);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.kanban-card.is-dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.375rem; }
+  h3 { font-size: 1.125rem; }
+
+  .kanban-board {
+    gap: 12px;
+  }
+
+  .kanban-column {
+    width: 260px;
+    min-width: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    font-size: 15px;
+  }
+
+  .kanban-column {
+    width: 240px;
+    min-width: 240px;
+  }
 }
