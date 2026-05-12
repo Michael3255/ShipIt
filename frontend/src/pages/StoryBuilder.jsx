@@ -158,7 +158,7 @@ export const StoryBuilder = () => {
               </Grid>
 
               {/* Actions */}
-              <Stack direction="row" spacing={1.5} mt={3}>
+              <Stack direction="row" spacing={1.5} mt={3} sx={{ pt: 2 }}>
                 <Button
                   type="submit"
                   variant="contained"

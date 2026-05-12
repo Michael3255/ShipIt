@@ -59,7 +59,7 @@ const inputSx = {
 }
 
 // ─── Task Form (inline add task in board columns) ─────────────────
-function TaskForm({ column, objectives, objectiveFilter, formData, handleChange, handleSubmit, onCancel }) {
+function TaskForm({ objectives, formData, handleChange, handleSubmit, onCancel }) {
   const isValid = formData.title !== "" && formData.due_date !== ""
 
   return (
@@ -230,7 +230,6 @@ function Column({ column, tasks, onOpenDrawer, activeColumn, setActiveColumn, ob
       {/* Inline add task form or add button */}
       {activeColumn === column.id ? (
         <TaskForm
-          column={column}
           objectives={objectives}
           objectiveFilter={objectiveFilter}
           formData={formData}
@@ -418,7 +417,7 @@ export const KanbanBoard = () => {
 
         {/* Objective filter dropdown — always visible */}
         <Stack direction="row" alignItems="center" spacing={1.5}>
-          <FilterListIcon sx={{ fontSize: 16, color: COLORS.blue }} />
+          <FilterListIcon sx={{ fontSize: 16, color: COLORS.blue, mr:2 }} />
           <FormControl size="small">
             <Select
               value={objectiveFilter || ''}
@@ -461,7 +460,7 @@ export const KanbanBoard = () => {
               textTransform: 'none', fontWeight: 700, borderRadius: 2,
               bgcolor: viewMode === 'board' ? COLORS.blue : 'transparent',
               borderColor: COLORS.blue, color: viewMode === 'board' ? '#fff' : COLORS.blue,
-              '&:hover': { bgcolor: COLORS.blueDark, color: '#fff' }
+              '&:hover': { bgcolor: COLORS.blueDark, color: '#fff' }, ml:2
             }}
           >
             Board
@@ -475,7 +474,7 @@ export const KanbanBoard = () => {
               textTransform: 'none', fontWeight: 700, borderRadius: 2,
               bgcolor: viewMode === 'list' ? COLORS.blue : 'transparent',
               borderColor: COLORS.blue, color: viewMode === 'list' ? '#fff' : COLORS.blue,
-              '&:hover': { bgcolor: COLORS.blueDark, color: '#fff' }
+              '&:hover': { bgcolor: COLORS.blueDark, color: '#fff' }, mr:2,
             }}
           >
             List
@@ -514,6 +513,7 @@ export const KanbanBoard = () => {
             flexDirection: 'row',
             gap: 2,
             overflowX: 'auto',
+            pt:2,
             pb: 2,
             alignItems: 'flex-start',
           }}>
