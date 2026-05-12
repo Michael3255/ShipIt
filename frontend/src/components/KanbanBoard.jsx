@@ -340,14 +340,12 @@ export const KanbanBoard = () => {
     async function load() {
       try {
         setLoading(true)
-        const [projectData, objectivesData, tasksData] = await Promise.all([
+        const [projectData, objectivesData] = await Promise.all([
           getProject(projectId, authFetch),
           getObjectives(projectId, authFetch),
-          getTasks({ project: projectId }, authFetch),
         ])
         setProject(projectData)
         setObjectives(objectivesData)
-        setTasks(tasksData)
       } catch (err) {
         setError(err.message)
       } finally {
@@ -357,11 +355,11 @@ export const KanbanBoard = () => {
     if (authFetch && projectId) load()
   }, [projectId, authFetch])
 
-  // ── Reload tasks when objective filter changes ──
   useEffect(() => {
     async function loadTasks() {
       try {
         setTasksLoading(true)
+        // always use objectiveFilter if present, otherwise load all project tasks
         const filters = objectiveFilter
           ? { objective: objectiveFilter }
           : { project: projectId }
