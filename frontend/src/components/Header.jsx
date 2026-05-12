@@ -30,6 +30,7 @@ export default function Header() {
         backdropFilter: "blur(14px)",
         borderBottom: "1px solid rgba(255,255,255,0.08)",
         boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
+        
       }}
     >
       <Toolbar
@@ -64,7 +65,7 @@ export default function Header() {
             to="/projects"
             sx={{
               textDecoration: "none",
-              color: "#fff",
+              color:"#1358C4",
               fontWeight: 800,
               fontSize: 24,
               letterSpacing: "-0.6px",
@@ -72,6 +73,7 @@ export default function Header() {
               '&:hover': {
                 opacity: 0.85,
               },
+             ml:2 
             }}
           >
             ShipIt
@@ -84,6 +86,7 @@ export default function Header() {
             display: "flex",
             alignItems: "center",
             gap: 1,
+            
           }}
         >
           {[
@@ -96,7 +99,7 @@ export default function Header() {
               component={Link}
               to={to}
               sx={{
-                color: "rgba(255,255,255,0.82)",
+                color:"#1358C4",
                 fontWeight: 600,
                 fontSize: 14,
                 textTransform: "none",

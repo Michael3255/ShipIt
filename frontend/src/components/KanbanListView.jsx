@@ -42,7 +42,7 @@ export function KanbanListView({
         sx={{
           mb: 2,
           fontWeight: 600,
-          color: 'text.primary',
+          color: COLORS.blue,
         }}
       >
         Objectives
