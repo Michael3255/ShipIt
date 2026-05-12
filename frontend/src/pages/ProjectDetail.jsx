@@ -27,8 +27,8 @@ const COLORS = {
   card:        "#FFFFFF",
   border:      "#E4EAF2",
   textPrimary: "#0D1B2A",
-  textMuted:   "#5C6E82",
-  textLight:   "#98A8B8",
+  textMuted:   "#0D1B2A",
+  textLight:   "#0D1B2A",
 }
 
 const STATUS_META = {
@@ -59,7 +59,7 @@ function ProjectHeader({ project }) {
       }} />
       <Stack direction="row" alignitems="center" spacing={1.5} mb={1}>
         <RocketLaunchIcon sx={{ fontSize: 20, opacity: 0.85 }} />
-        <Typography sx={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.5, opacity: 0.85, textTransform: "uppercase" }}>
+        <Typography sx={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.5, color: "black", opacity: 0.95, textTransform: "uppercase" }}>
           Project
         </Typography>
       </Stack>
@@ -67,18 +67,18 @@ function ProjectHeader({ project }) {
         {project.title}
       </Typography>
       {project.description && (
-        <Typography sx={{ opacity: 0.85, fontSize: 15, maxWidth: 560 }}>
+        <Typography sx={{ opacity: 0.85, fontSize: 15, maxWidth: 560, color: "black" }}>
           {project.description}
         </Typography>
       )}
       <Stack direction="row" spacing={3} mt={2.5}>
         <Box>
-          <Typography sx={{ fontSize: 11, opacity: 0.7, textTransform: "uppercase", letterSpacing: 1 }}>Owner</Typography>
-          <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{project.owner || "—"}</Typography>
+          <Typography sx={{ fontSize: 11, opacity: 0.7, textTransform: "uppercase", letterSpacing: 1, color: "black" }}>Owner</Typography>
+          <Typography sx={{ fontWeight: 600, fontSize: 14, color:"black" }}>{project.owner || "—"}</Typography>
         </Box>
         <Box>
-          <Typography sx={{ fontSize: 11, opacity: 0.7, textTransform: "uppercase", letterSpacing: 1 }}>Team</Typography>
-          <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{project.team || "—"}</Typography>
+          <Typography sx={{ fontSize: 11, opacity: 0.7, textTransform: "uppercase", letterSpacing: 1, color: "black" }}>Team</Typography>
+          <Typography sx={{ fontWeight: 600, fontSize: 14, color: "black" }}>{project.team || "—"}</Typography>
         </Box>
       </Stack>
     </Box>
@@ -152,7 +152,7 @@ function ObjectiveCard({ objective, projectId, navigate }) {
         </Box>
 
         <Stack direction="row" justifycontent="space-between" alignitems="center">
-          <Typography sx={{ fontSize: 12, color: COLORS.textMuted, fontWeight: 500 }}>
+          <Typography sx={{ fontSize: 12, color: COLORS.textPrimary, fontWeight: 500 }}>
             {objective.tasks_done} / {objective.tasks_total} tasks
             {isComplete && (
               <Box component="span" sx={{ ml: 1, color: COLORS.tealDark, fontWeight: 700 }}>

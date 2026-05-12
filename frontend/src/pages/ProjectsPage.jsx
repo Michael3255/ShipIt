@@ -289,9 +289,9 @@ export const ProjectsPage = () => {
       {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
 
       {/* Header row */}
-      <Stack direction="row" justifycontent="space-between" alignitems="center" mb={3}>
-        <Stack direction="row" alignitems="center" spacing={1.5}>
-          <Typography sx={{ fontWeight: 800, fontSize: 18, color: 'text.primary' }}>
+      <Stack direction="row" justifycontent="space-between" alignitems="center" mb={3} sx={{ pb:3 }}>
+        <Stack direction="row" alignitems="center" spacing={2} >
+          <Typography sx={{ fontWeight: 800, fontSize: 18, color: 'text.primary',}}>
             All Projects
           </Typography>
           {!loading && (
@@ -318,7 +318,7 @@ export const ProjectsPage = () => {
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 700,
-            boxShadow: `0 4px 12px rgba(27,111,235,0.25)`,
+            boxShadow: `0 4px 12px rgba(27,111,235,0.25)`, ml: 2
           }}
         >
           Add Project
