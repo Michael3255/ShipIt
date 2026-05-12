@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import AuthContext from '../context/AuthContext'
-import { getTeams, createTeam, editTeam, deleteTeam } from '../api/teams'
+import { getTeamsAuth, createTeam, editTeam, deleteTeam } from '../api/teams'
 import { Link } from 'react-router-dom'
 
 import Container from '@mui/material/Container'
@@ -37,7 +37,7 @@ export const TeamsPage = () => {
         setLoading(true)
         setError('')
 
-        const data = await getTeams(authFetch)
+        const data = await getTeamsAuth(authFetch)
         setTeams(data)
       } catch (err) {
         setError(err.message)
