@@ -8,6 +8,7 @@ import { useState, useEffect, useContext } from 'react'
 import AuthContext from '../context/AuthContext'
 import { getTask, editTask } from '../api/tasks'
 import { getComments, createComment, editComment, deleteComment } from '../api/comments'
+import { getTeamMembers } from '../api/users'
 
 import {
   Drawer, Box, Typography, TextField, Button, Stack,
@@ -92,6 +93,9 @@ export function TaskDrawer({ taskId, open, onClose, onTaskUpdated }) {
   })
   const [saving, setSaving] = useState(false)
 
+  // ── Team members state ──
+  const [teamMembers, setTeamMembers] = useState([])
+
   // ── Comments state ──
   const [comments, setComments] = useState([])
   const [commentsLoading, setCommentsLoading] = useState(false)
@@ -101,7 +105,7 @@ export function TaskDrawer({ taskId, open, onClose, onTaskUpdated }) {
   const [confirmDeleteCommentId, setConfirmDeleteCommentId] = useState(null)
   const [commentError, setCommentError] = useState('')
 
-  // ── Load task and comments when drawer opens ──
+  // ── Load task, team members, and comments when drawer opens ──
   useEffect(() => {
     if (!open || !taskId) return
 
@@ -125,6 +129,15 @@ export function TaskDrawer({ taskId, open, onClose, onTaskUpdated }) {
       }
     }
 
+    async function loadTeamMembers() {
+      try {
+        const data = await getTeamMembers(authFetch)
+        setTeamMembers(data)
+      } catch (err) {
+        console.error('Failed to load team members:', err)
+      }
+    }
+
     async function loadComments() {
       try {
         setCommentsLoading(true)
@@ -137,6 +150,7 @@ export function TaskDrawer({ taskId, open, onClose, onTaskUpdated }) {
       }
     }
 
+    loadTeamMembers()
     loadTask()
     loadComments()
   }, [open, taskId, authFetch])
@@ -291,6 +305,23 @@ export function TaskDrawer({ taskId, open, onClose, onTaskUpdated }) {
                   slotProps={{ inputLabel: { shrink: true } }}
                   sx={inputSx}
                 />
+                {/* Assign a user to task section */}
+                <FormControl fullWidth size="small">
+                  <InputLabel>Assigned To</InputLabel>
+                  <Select
+                    label="Assigned To"
+                    value={formData.assigned_user || ''}
+                    onChange={(e) => setFormData(p => ({ ...p, assigned_user: e.target.value }))}
+                    sx={inputSx}
+                  >
+                    <MenuItem value="">Unassigned</MenuItem>
+                    {teamMembers.map((member) => (
+                      <MenuItem key={member.id} value={member.id}>
+                        {member.username}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>                
                 {taskError && <Alert severity="error" sx={{ borderRadius: 2 }}>{taskError}</Alert>}
                 <Stack direction="row" spacing={1}>
                   <Button
