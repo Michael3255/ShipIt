@@ -109,7 +109,7 @@ export default function Header() {
                 transition: "all 0.2s ease",
                 '&:hover': {
                   background: "rgba(255,255,255,0.12)",
-                  color: "#fff",
+                  color: "COLORS.primary",
                   transform: "translateY(-1px)",
                 },
               }}
