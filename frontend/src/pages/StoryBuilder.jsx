@@ -1,7 +1,10 @@
-import React, { useState } from "react"
+import React, { useContext, useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
+import AuthContext from "../context/AuthContext"
+
 import {
   TextField, FormControl, Box, Stack, Button,
-  Typography, Card, CardContent, Alert, Chip, Divider
+  Typography, Card, CardContent, Alert, Chip, Divider, InputLabel, Select, MenuItem
 } from "@mui/material"
 import Grid from "@mui/material/Grid"
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome"
@@ -9,6 +12,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import TaskAltIcon from "@mui/icons-material/TaskAlt"
 import CloseIcon from "@mui/icons-material/Close"
 import { generateStory } from "../api/aiTools"
+import { getObjectives } from "../api/objectives"
+import { createTask } from "../api/tasks"
 
 // ─── Design Tokens ────────────────────────────────────────────────
 const COLORS = {
@@ -34,10 +39,36 @@ const inputSx = {
 const EMPTY_FORM = { project_title: "", objective: "", feature: "" }
 
 export const StoryBuilder = () => {
+  const { projectId } = useParams()
+  const { authFetch } = useContext(AuthContext)
+
+  const [objectives, setObjectives] = useState([])
+  const [selectedObjectiveId, setSelectedObjectiveId] = useState(null)
+  const [objectivesLoading, setObjectivesLoading] = useState(true)
+  const [objectivesError, setObjectivesError] = useState("")
+  const [addedTask,setAddedTask] = useState([])
+  const [taskCreateError, setTaskCreateError] = useState("")
+
   const [formData, setFormData] = useState(EMPTY_FORM)
   const [result,   setResult]   = useState(null)
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState("")
+
+  useEffect(() => {
+    async function loadObjectives(){
+      try{
+        setObjectivesLoading(true)
+        setObjectivesError("")
+        const data = await getObjectives(projectId, authFetch)
+        setObjectives(data)
+      }catch (err){
+        setObjectivesError(err.message)
+      }finally {
+        setObjectivesLoading(false)
+      }
+    }
+    if (authFetch) loadObjectives()
+  }, [projectId, authFetch])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -54,6 +85,25 @@ export const StoryBuilder = () => {
     setError("")
   }
 
+  async function handleAddSuggestedTask(taskText){
+    try {
+      if (!selectedObjectiveId){
+        setError("Objective does not exist")
+        return
+      }
+      const payload = {
+        title:taskText,
+        description: `Generated from Task Builder for: ${formData.feature}`,
+        status: "To Do",
+        due_date:new Date().toISOString().split("T")[0],
+        objective: selectedObjectiveId
+      }
+      const addedTask = await createTask(selectedObjectiveId, payload, authFetch)
+      setAddedTask((prev) => [...prev, addedTask])
+    }catch(err){
+      setTaskCreateError(err.message)
+    }
+  }
   async function handleSubmit(event) {
     event.preventDefault()
     try {
@@ -72,7 +122,7 @@ export const StoryBuilder = () => {
   const isFormValid = formData.project_title !== "" && formData.objective !== "" && formData.feature !== ""
 
   return (
-    <Box sx={{ maxWidth: 760, mx: "auto", px: { xs: 2, sm: 0 } }}>
+    <Box sx={{ maxWidth: 760, mx: "auto", px: { xs: 2, sm: 0 }, pt:4 }}>
 
       {/* Header */}
       <Stack direction="row" alignItems="center" spacing={1.5} mb={3}>
@@ -84,11 +134,11 @@ export const StoryBuilder = () => {
           <AutoAwesomeIcon sx={{ fontSize: 18, color: "#fff" }} />
         </Box>
         <Box>
-          <Typography sx={{ fontWeight: 800, fontSize: 18, color: "text.primary", lineHeight: 1.2 }}>
-            Story Builder
+          <Typography sx={{ fontWeight: 800, fontSize: 18, color: "text.primary", lineHeight: 1.2}}>
+            Task Builder
           </Typography>
-          <Typography sx={{ fontSize: 12, color: "text.secondary" }}>
-            Generate user stories, completion checks and task suggestions
+          <Typography sx={{ fontSize: 12, color: "text.secondary", pb:3}}>
+            Generate completion checks and task suggestions
           </Typography>
         </Box>
       </Stack>
@@ -120,18 +170,30 @@ export const StoryBuilder = () => {
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography sx={{ fontSize: 12, fontWeight: 600, color: "text.secondary", mb: 0.75, textTransform: "uppercase", letterSpacing: 0.6 }}>
+                  <Typography sx={{ fontSize: 12, fontWeight: 600, color: "text.secondary", mb:0.75}}>
                     Objective
-                  </Typography>
-                  <TextField
-                    fullWidth required
-                    placeholder="e.g. User Authentication"
-                    name="objective"
-                    value={formData.objective}
-                    onChange={handleChange}
-                    size="small"
-                    sx={inputSx}
-                  />
+                  </Typography>                  
+                  <FormControl fullWidth size="small" sx={inputSx}>
+                    <Select
+                      displayEmpty
+                      value={selectedObjectiveId ?? ""}
+                      onChange={(e) =>{
+                        const selectedId = e.target.value
+                        setSelectedObjectiveId(selectedId)
+                        
+                        const selectedObjective = objectives.find(o =>o.id === selectedId)
+
+                        setFormData(prev => ({...prev, objective: selectedObjective?.title ?? ""}))
+                      }}
+                      disabled={objectivesLoading}
+                    >
+                      <MenuItem value="" disabled>
+                      {objectivesLoading ? "Loading..." : "Select an objective"}
+                      </MenuItem>
+                      {objectives.map((objective) => (<MenuItem key={objective.id} value={objective.id}>{objective.title}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl> 
                 </Grid>
 
                 <Grid size={{ xs: 12 }}>
@@ -207,6 +269,11 @@ export const StoryBuilder = () => {
           sx={{ mb: 3, borderRadius: 2 }}
         >
           {error}
+        </Alert>
+      )}
+      {/* Objectives loading error */}
+      {objectivesError && (
+        <Alert severity="error" onClose={() => setObjectivesError("")} sx={{ mb: 2, borderRadius: 2 }}>{objectivesError}
         </Alert>
       )}
 
@@ -318,19 +385,45 @@ export const StoryBuilder = () => {
                 />
               </Stack>
               <Stack spacing={1}>
-                {result.suggested_tasks.map((task, index) => (
+                {result.suggested_tasks.map((task, index) => {
+                  const alreadyAdded = addedTask.some(t=> t.title === task)
+                  return (
                   <Stack key={index} direction="row" alignItems="flex-start" spacing={1.5}
-                    sx={{ p: 1.5, borderRadius: 2, bgcolor: COLORS.surface, border: `1px solid ${COLORS.border}` }}
+                  sx={{ p: 1.5, borderRadius: 2, bgcolor: COLORS.surface, border: `1px solid ${COLORS.border}`}}
                   >
                     <TaskAltIcon sx={{ fontSize: 16, color: "#8B5CF6", mt: 0.2, flexShrink: 0 }} />
                     <Typography sx={{ fontSize: 13, color: "text.primary", lineHeight: 1.5 }}>
                       {task}
                     </Typography>
+                    {alreadyAdded ? (
+                      <Chip label="Added x" size="small" sx={{ bgcolor: COLORS.tealLight, color:COLORS.teal, fontWeight: 700 }} />
+                    ): (
+                        <Button variant="contained"
+                        onClick={() => handleAddSuggestedTask(task)}
+                        sx={{
+                          bgcolor: COLORS.blue,
+                          "&:hover": { bgcolor: COLORS.blueDark },
+                          borderRadius: 2,
+                          textTransform: "none",
+                          fontWeight: 700,
+                          flexShrink: 0,
+                          px: 3, ml:"auto" 
+                        }}>
+                          + Add Task
+                        </Button>
+                      
+                    )}
                   </Stack>
-                ))}
+                  )
+                  
+                })}
               </Stack>
             </Box>
-
+            {taskCreateError && (
+              <Alert severity="error" onClose={() => setTaskCreateError("")} sx={{ mt: 2, borderRadius: 2 }}>
+                {taskCreateError}
+              </Alert>
+            )}
           </CardContent>
         </Card>
       )}

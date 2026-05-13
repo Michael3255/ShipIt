@@ -30,10 +30,6 @@ function AppRoutes() {
                     <Layout />
                 </ProtectedRoute>
             }>
-                {/* API - AI Tools */}
-                {/* AI Story Builder */}
-                <Route path="/story-builder" element={<StoryBuilder />} />
-
                 {/* Dashboard */}
                 <Route path="/dashboard" element={<Dashboard />} />
                 
@@ -54,6 +50,9 @@ function AppRoutes() {
 
                 {/* ProjectId -> board */}
                 <Route path="/projects/:projectId/board" element={ <KanbanBoard /> } />
+
+                {/* API - Task Builder Tool */}
+                <Route path="/projects/:projectId/story-builder" element={<StoryBuilder />} />
 
             </Route>
         </Routes>
