@@ -2,8 +2,7 @@
 POST to /api/ai/story-builder/
 return JSON response
 throw error if response is not ok */
-const BASE_URL = "${import.meta.env.VITE_API_BASE_URL}/ai/story-builder/";
-
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/ai/story-builder/`;
 export async function generateStory(formData) {
   const response = await fetch(`${BASE_URL}`, {
     method: "POST",

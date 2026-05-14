@@ -1,4 +1,4 @@
-const BASE_URL = "${import.meta.env.VITE_API_BASE_URL}/teams";
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/teams`;
 
 // getTeams uses accessToken because it's also called from register page
 // where the user may not be logged in yet
