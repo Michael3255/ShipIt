@@ -1,4 +1,4 @@
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/comments`;
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/board/comments`
 
 export async function getComments(taskId, authFetch) {
   const response = await authFetch(`${BASE_URL}/?task=${taskId}`)

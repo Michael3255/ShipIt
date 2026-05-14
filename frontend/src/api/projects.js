@@ -1,4 +1,4 @@
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/projects`
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/board/projects`
 
 export async function getProjects(authFetch) {
   const response = await authFetch(`${BASE_URL}/`)

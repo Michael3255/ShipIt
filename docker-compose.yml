@@ -31,15 +31,17 @@ services:
       - ./backend:/app
 
   # ── React Frontend ──
-  frontend:
-    build: ./frontend
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    depends_on:
-      - backend
+frontend:
+  build: ./frontend
+  ports:
+    - "5173:5173"
+  environment:
+    - VITE_API_BASE_URL=http://54.144.92.70:8000/api
+  volumes:
+    - ./frontend:/app
+    - /app/node_modules
+  depends_on:
+    - backend
 
 volumes:
   postgres_data:

@@ -1,4 +1,4 @@
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/tasks`;
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/board/tasks`
 
 export async function getTask(taskId, authFetch) {
   const response = await authFetch(`${BASE_URL}/${taskId}/`)

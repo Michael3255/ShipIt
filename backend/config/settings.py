@@ -153,6 +153,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
+ALLOWED_HOSTS = ['54.144.92.70', 'localhost', '127.0.0.1']
+
 CORS_ALLOWED_ORIGINS = [
     "http://54.144.92.70:5173",
     "http://localhost:5173",
