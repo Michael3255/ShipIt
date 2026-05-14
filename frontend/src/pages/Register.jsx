@@ -58,7 +58,7 @@ function Register() {
 
       
 
-      const res = await fetch("http://localhost:8000/api/users/signup/", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/signup/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password, password_confirm: confirmPassword, team: selectedTeamId, }),
