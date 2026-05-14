@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
             logout()
             return null
         }
-        const res = await fetch("http://localhost:8000/api/token/refresh/", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/token/refresh/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ refresh })

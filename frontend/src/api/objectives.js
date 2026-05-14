@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:8000/api/objectives";
+const BASE_URL = "${import.meta.env.VITE_API_BASE_URL}/objectives";
 
 export async function getObjectives(projectId, authFetch) {
   const response = await authFetch(`${BASE_URL}/?project=${projectId}`)
