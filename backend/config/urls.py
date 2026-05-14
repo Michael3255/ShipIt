@@ -20,17 +20,16 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
+
     # App Endpoints
-    path('api/', include('board.urls')),
-    path('api/', include('teams.urls')),
-    path('api/', include('users.urls')),
+    path('api/board/', include('board.urls')),
+    path('api/teams/', include('teams.urls')),
+    path('api/users/', include('users.urls')),
     
-    # AI Tools endpoints
-    path('api/ai/', include ('ai_tools.urls')),
+    # AI Tools
+    path('api/ai/', include('ai_tools.urls')),
 
-    # JWT auth endpoints
+    # JWT Auth
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
