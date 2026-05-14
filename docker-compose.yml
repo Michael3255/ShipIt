@@ -40,3 +40,6 @@ services:
       - /app/node_modules
     depends_on:
       - backend
+
+volumes:
+  postgres_data:
